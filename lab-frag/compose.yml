@@ -1,0 +1,33 @@
+x-common: &common-settings
+  privileged: true
+  restart: "no"
+  ulimits:
+    nofile:
+      soft: 100000
+      hard: 200000
+
+services:
+  router:
+    build: ./router
+    image: lab-frag-router
+    container_name: router
+    hostname: router
+    <<: *common-settings
+    networks:
+      N0: { ipv4_address: 10.0.0.3 }
+      N1: { ipv4_address: 10.0.1.2 }
+
+  server:
+    build: ./server
+    image: lab-frag-server
+    container_name: server
+    <<: *common-settings
+    networks:
+      N1: { ipv4_address: 10.0.1.3 }
+
+networks:
+  N0:
+    ipam: { config: [{subnet: 10.0.0.0/24}] }
+  N1:
+    driver_opts: { com.docker.network.driver.mtu: 400 }
+    ipam: { config: [{subnet: 10.0.1.0/24}] }

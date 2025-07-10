@@ -1,0 +1,71 @@
+x-common: &common-settings
+  privileged: true
+  restart: "no"
+  ulimits:
+    nofile:
+      soft: 100000
+      hard: 200000
+
+services:
+  r1:
+    build: ./router
+    image: lab1-router
+    container_name: r1
+    hostname: r1
+    <<: *common-settings
+    volumes:
+      - ./rip/R1-ripd.conf:/etc/frr/ripd.conf
+      - ./ospfd.conf:/etc/frr/ospfd.conf
+    networks:
+      N0: { ipv4_address: 10.0.0.3 }
+      N1: { ipv4_address: 10.0.1.2 }
+
+  r2:
+    image: lab1-router
+    container_name: r2
+    hostname: r2
+    <<: *common-settings
+    volumes:
+      - ./rip/R2-ripd.conf:/etc/frr/ripd.conf
+      - ./ospfd.conf:/etc/frr/ospfd.conf
+    networks:
+      N1: { ipv4_address: 10.0.1.3 }
+      N2: { ipv4_address: 10.0.2.2 }
+
+  r3:
+    image: lab1-router
+    container_name: r3
+    hostname: r3
+    <<: *common-settings
+    volumes:
+      - ./rip/R3-ripd.conf:/etc/frr/ripd.conf
+      - ./ospfd.conf:/etc/frr/ospfd.conf
+    networks:
+      N2: { ipv4_address: 10.0.2.3 }
+      N3: { ipv4_address: 10.0.3.2 }
+
+  server:
+    build: ./server
+    image: lab1-server
+    container_name: server
+    <<: *common-settings
+    networks:
+      N3: { ipv4_address: 10.0.3.3 }
+
+networks:
+  N0:
+    driver: bridge
+    driver_opts: { com.docker.network.bridge.name: N0 }
+    ipam: { config: [{subnet: 10.0.0.0/24}] }
+  N1:
+    driver: bridge
+    driver_opts: { com.docker.network.bridge.name: N1 }
+    ipam: { config: [{subnet: 10.0.1.0/24}] }
+  N2:
+    driver: bridge
+    driver_opts: { com.docker.network.bridge.name: N2 }
+    ipam: { config: [{subnet: 10.0.2.0/24}] }
+  N3:
+    driver: bridge
+    driver_opts: { com.docker.network.bridge.name: N3 }
+    ipam: { config: [{subnet: 10.0.3.0/24}] }
