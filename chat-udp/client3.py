@@ -1,5 +1,5 @@
-#!/usr/bin/python3
-# -*- coding:utf-8; tab-width:4; mode:python -*-
+#!/usr/bin/env python3
+# Copyright: See AUTHORS and COPYING
 
 import socket
 QUIT = b"bye"

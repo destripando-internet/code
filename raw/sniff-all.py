@@ -1,4 +1,5 @@
-#!/usr/bin/python3
+#!/usr/bin/env python3
+# Copyright: See AUTHORS and COPYING
 
 import socket
 
