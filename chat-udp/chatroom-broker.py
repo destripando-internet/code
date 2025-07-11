@@ -36,4 +36,3 @@ try:
     main()
 except KeyboardInterrupt:
     print("shut down.")
-    sock.close()

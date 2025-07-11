@@ -7,25 +7,28 @@ QUIT = 'bye'
 
 
 class ChatroomBroker:
-    def __init__(self):
-        self.master = socket.socket()
-        self.master.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-        self.master.bind(('', 12345))
-        self.master.listen(5)
+    def main(self):
+        with socket.socket() as self.master:
+            self.master.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+            self.master.bind(('', 12345))
+            self.master.listen(5)
 
-        self.members = {}
-        self.selector = selectors.DefaultSelector()
-        self.selector.register(self.master, selectors.EVENT_READ, self.acceptor)
+            self.members = {}
+            self.selector = selectors.DefaultSelector()
+            self.selector.register(self.master, selectors.EVENT_READ, self.acceptor)
+
+            while True:
+                for key, mask in self.selector.select():
+                    key.data(key.fileobj)
 
     def acceptor(self, sock):
         conn, addr = self.master.accept()
         print("New connection from", addr)
         self.members[conn] = None
-        self.selector.register(conn, selectors.EVENT_READ, self.reader)
+        self.selector.register(conn, selectors.EVENT_READ, self.receiver)
 
-    def reader(self, conn):
+    def receiver(self, conn):
         message = conn.recv(1024).decode().strip()
-        print(message)
         if message == QUIT or not message:
             print("User '{}' has left the chat.".format(self.members[conn]))
             self.selector.unregister(conn)
@@ -47,14 +50,8 @@ class ChatroomBroker:
             encoded = "{}: {}\n".format(sender, message).encode()
             member_conn.sendall(encoded)
 
-    def run(self):
-        while True:
-            for key, mask in self.selector.select():
-                callback = key.data
-                callback(key.fileobj)
-
 
 try:
-    ChatroomBroker().run()
+    ChatroomBroker().main()
 except KeyboardInterrupt:
     print("shut down.")
