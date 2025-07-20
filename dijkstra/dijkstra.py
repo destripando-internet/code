@@ -54,9 +54,9 @@ class Network:
             paths[dest] = self.get_path(source, dest)
         return paths
 
-    def routing_table(self, source):
+    def routing_table(self, node):
         routing_table = {}
-        paths = self.get_paths(source)
+        paths = self.get_paths(node)
 
         for node, path in paths.items():
             next_hop = path[1] if len(path) > 1 else '-'
