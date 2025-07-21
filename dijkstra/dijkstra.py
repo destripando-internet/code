@@ -47,7 +47,7 @@ class Network:
 
         return list(reversed(path))
 
-    def get_paths(self, source):
+    def get_spt(self, source):
         nodes = self.graph.keys()
         paths = {}
         for dest in nodes:
@@ -56,7 +56,7 @@ class Network:
 
     def routing_table(self, node):
         routing_table = {}
-        paths = self.get_paths(node)
+        paths = self.get_spt(node)
 
         for node, path in paths.items():
             next_hop = path[1] if len(path) > 1 else '-'
