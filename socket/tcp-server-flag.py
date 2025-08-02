@@ -10,12 +10,19 @@ def int_handler(sig, frame):
     exit(0)
 
 
-def handle(conn):
+def readline(conn):
     data = bytes()
     while (i := data.find(b'\n')) == -1:
-        data += conn.recv(1024)
+        chunk = conn.recv(1024)
+        if not chunk:
+            return data
+        data += chunk
     line = data[:i]
+    return line
 
+
+def handle(conn):
+    line = readline(conn)
     print(f"Se ha recibido el mensaje: {line}")
     conn.sendall(f"Enviaste {len(line)} bytes\n".encode())
     conn.close()
