@@ -3,7 +3,7 @@
 import socket
 
 
-def readline(conn):
+def read_message(conn):
     data = bytes()
     while (i := data.find(b'\n')) == -1:
         chunk = conn.recv(1024)
@@ -18,7 +18,7 @@ sock = socket.socket()
 sock.connect(('127.0.0.1', 2000))
 
 sock.sendall(b'hola\n')
-reply = readline(sock)
+reply = read_message(sock)
 
 print(f"El servidor ha respondido: {reply.decode()}")
 sock.close()
