@@ -1,6 +1,6 @@
 #!/usr/bin/python3
+# Copyright: See AUTHORS and COPYING
 "Calc checksum for all sniffed ICMP packages"
-# Copyright (C) 2009-2021  David Villa Alises
 
 import time
 import socket

@@ -1,4 +1,5 @@
 #!/usr/bin/python3
+# Copyright: See AUTHORS and COPYING
 "Internet checksum algorithm RFC-1071"
 
 
