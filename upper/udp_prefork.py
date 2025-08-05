@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 # Copyright: See AUTHORS and COPYING
-"Usage: {0} <port>"
 
 import sys
 import time
@@ -32,7 +31,7 @@ def main(port):
 
 
 if len(sys.argv) != 2:
-    print(__doc__.format(sys.argv[0]))
+    print("Usage: {0} <port>".format(sys.argv[0]))
     sys.exit(1)
 
 try:

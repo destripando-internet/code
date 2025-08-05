@@ -1,8 +1,6 @@
 #!/usr/bin/env python3
 # Copyright: See AUTHORS and COPYING
 
-"usage: %s [--server|--client]"
-
 import sys
 import socket
 from threading import Thread
@@ -41,7 +39,7 @@ class Chat:
 
 if __name__ == '__main__':
     if len(sys.argv) != 2:
-        print(__doc__ % sys.argv[0])
+        print("usage: %s [--server|--client]".format(sys.argv[0]))
         sys.exit()
 
     mode = sys.argv[1]

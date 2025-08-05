@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 # Copyright: See AUTHORS and COPYING
-"Usage: {0} <port>"
 
 import sys
 import os
@@ -30,7 +29,7 @@ class CustomTCPServer(TCPServer):
 
 
 if len(sys.argv) != 2:
-    print(__doc__.format(sys.argv[0]))
+    print("Usage: {0} <port>".format(sys.argv[0]))
     sys.exit(1)
 
 server = CustomTCPServer(('', int(sys.argv[1])), Handler)

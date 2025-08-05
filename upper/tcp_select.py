@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 # Copyright: See AUTHORS and COPYING
-"Usage: {0} <port>"
 
 import sys
 import socket
@@ -49,7 +48,7 @@ class Server:
 
 if __name__ == "__main__":
     if len(sys.argv) != 2:
-        print(__doc__.format(sys.argv[0]))
+        print("Usage: {0} <port>".format(sys.argv[0]))
         exit(1)
 
     try:

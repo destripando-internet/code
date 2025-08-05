@@ -1,12 +1,11 @@
 #!/usr/bin/env python3
 # Copyright: See AUTHORS and COPYING
-"Usage: {0} <port>"
 
 import sys
 import time
-from threading import Thread, current_thread
 import queue
 from socket import socket, SOCK_DGRAM
+from threading import Thread, current_thread
 from concurrent.futures import ThreadPoolExecutor
 
 MAX_THREADS = 20
@@ -45,7 +44,7 @@ def main(port):
 
 if __name__ == '__main__':
     if len(sys.argv) != 2:
-        print(__doc__.format(sys.argv[0]))
+        print("Usage: {0} <port>".format(sys.argv[0]))
         sys.exit(1)
 
     try:

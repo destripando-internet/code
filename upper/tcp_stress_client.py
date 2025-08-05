@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 # Copyright: See AUTHORS and COPYING
-"Usage: {0} <host> <port> <n_clients>"
 
 import sys
 import asyncio
@@ -44,7 +43,7 @@ async def main(host, port, nclients):
 
 
 if len(sys.argv) != 4:
-    print(__doc__.format(sys.argv[0]))
+    print("Usage: {0} <host> <port> <n_clients>".format(sys.argv[0]))
     sys.exit(1)
 
 try:
