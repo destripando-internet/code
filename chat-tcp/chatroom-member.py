@@ -14,6 +14,9 @@ class ChatroomMember:
         self.sock.connect(peer)
 
     def run(self):
+        nick = input("Enter you nick: ")
+        self.sock.sendall(nick.encode())
+
         selector = selectors.DefaultSelector()
         selector.register(sys.stdin, selectors.EVENT_READ, self.sending)
         selector.register(self.sock, selectors.EVENT_READ, self.receiving)
