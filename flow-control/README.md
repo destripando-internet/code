@@ -9,4 +9,4 @@ You may observe that the client stops sending when the buffers are full and resu
 
 Run this command to view socket variables:
 
-$ ss -timon sport = 2000 or dport = 2000
+    $ ss -timon sport = 2000 or dport = 2000
