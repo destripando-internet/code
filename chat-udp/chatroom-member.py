@@ -10,12 +10,12 @@ QUIT = b'bye'
 
 class ChatroomMember:
     def __init__(self, peer):
-        self.sock = socket.socket()
-        self.sock.connect(peer)
+        self.sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        self.peer = peer
 
     def run(self):
         nick = input("Enter you nick: ")
-        self.sock.sendall(nick.encode())
+        self.sock.sendto(nick.encode(), self.peer)
 
         selector = selectors.DefaultSelector()
         selector.register(sys.stdin, selectors.EVENT_READ, self.sending)
@@ -28,7 +28,7 @@ class ChatroomMember:
 
     def sending(self):
         message = input().encode()
-        self.sock.sendall(message)
+        self.sock.sendto(message, self.peer)
         return message
 
     def receiving(self):
@@ -39,5 +39,5 @@ class ChatroomMember:
 
 try:
     ChatroomMember(SERVER).run()
-except (KeyboardInterrupt, EOFError):
+except KeyboardInterrupt:
     print("shut down.")

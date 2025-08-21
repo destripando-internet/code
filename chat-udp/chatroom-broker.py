@@ -24,7 +24,7 @@ def main():
                 continue
 
             print(nick, '<-', message)
-            encoded = "{}: {}".format(sender, message).encode()
+            encoded = "{}: {}\n".format(sender, message).encode()
             sock.sendto(encoded, member_endpoint)
 
         if message == QUIT:
