@@ -1,5 +1,4 @@
-#!/usr/bin/env -S python -u
-'Usage: client.py <host> <port>'
+#!/usr/bin/env -S python3 -u
 
 import sys
 import socket
@@ -45,7 +44,7 @@ class Sender:
 
     def run(self):
         self.sent = 0
-        self.init = time.time()
+        self.start_time = time.time()
 
         try:
             self.sending()
@@ -59,7 +58,7 @@ class Sender:
             self.trace.update(self.sent, rate)
 
     def show_stats(self):
-        elapsed = time.time() - self.init
+        elapsed = time.time() - self.start_time
         rate = self.sent/1000/elapsed
         msg = f'sent:{self.sent//1000:,} kB, '
         msg += f'rate:{rate:,.0f} kB/s'
@@ -69,7 +68,7 @@ class Sender:
 
 
 if len(sys.argv) != 3:
-    print(__doc__)
+    print('Usage: client.py <host> <port>')
     sys.exit(1)
 
 host = sys.argv[1]

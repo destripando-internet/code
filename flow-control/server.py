@@ -1,5 +1,4 @@
-#!/usr/bin/env -S python -u
-'Usage: server.py <port> <rx_limit_limit>'
+#!/usr/bin/env -S python3 -u
 
 import sys
 import socket
@@ -26,8 +25,8 @@ class Receiver:
         rcv_buffer = self.conn.getsockopt(socket.SOL_SOCKET, socket.SO_RCVBUF) // 1000
         log(f'Receiving buffer size: {rcv_buffer:,} kB\n')
 
-        self.init = time.time()
         self.received = 0
+        self.start_time = time.time()
 
         try:
             self.receiving()
@@ -41,16 +40,16 @@ class Receiver:
                 break
 
             self.received += len(data)
-            elapsed = time.time() - self.init
+            elapsed = time.time() - self.start_time
             self.current_rate = self.received / elapsed
             self.show_stats()
 
             if self.current_rate <= self.rate_limit:
                 continue
 
-            sleep_time = (self.received / self.rate_limit) - elapsed
-            if sleep_time > 0:
-                time.sleep(sleep_time)
+            adjust_time = (self.received / self.rate_limit) - elapsed
+            if adjust_time > 0:
+                time.sleep(adjust_time)
 
     def show_stats(self):
         msg = f'received:{self.received//1000:,} kB, '
@@ -59,7 +58,7 @@ class Receiver:
 
 
 if len(sys.argv) != 3:
-    print(__doc__)
+    print('Usage: server.py <port> <rx_limit>')
     sys.exit(1)
 
 port = int(sys.argv[1])

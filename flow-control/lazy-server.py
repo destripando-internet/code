@@ -1,5 +1,4 @@
-#!/usr/bin/env -S python -u
-'Usage: server.py <port>'
+#!/usr/bin/env -S python3 -u
 
 import sys
 import socket
@@ -36,7 +35,7 @@ class Receiver:
 
 
 if len(sys.argv) != 2:
-    print(__doc__)
+    print('Usage: server.py <port>')
     sys.exit(1)
 
 port = int(sys.argv[1])
