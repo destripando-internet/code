@@ -1,7 +1,7 @@
 import struct
 from unittest import TestCase
 
-from inet_checksum import inet_checksum as cksum
+from checksum import inet_checksum as cksum
 
 
 class CheckSumTests(TestCase):
