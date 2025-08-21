@@ -62,7 +62,7 @@ class Sender:
         elapsed = time.time() - self.init
         rate = self.sent/1000/elapsed
         msg = f'sent:{self.sent//1000:,} kB, '
-        msg += f'rate:{rate:,.0f} kBps'
+        msg += f'rate:{rate:,.0f} kB/s'
         log(f'\r ({next(rotating)}) {msg} {10 * " "}\r')
         time.sleep(0.01)
         return rate
