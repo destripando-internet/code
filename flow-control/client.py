@@ -1,4 +1,5 @@
 #!/usr/bin/env -S python3 -u
+# Copyright: See AUTHORS and COPYING
 
 import sys
 import socket
