@@ -39,11 +39,8 @@ class Sender:
     def show_stats(self):
         elapsed = time.time() - self.start_time
         byterate = self.sent / elapsed / 1000
-        bitrate = byterate * 8
-
-        msg = f'sent(kB):{self.sent//1000:,}, '
-        msg += f'rate(kB/s):{byterate:,.0f}, '
-        msg += f'rate(kbps):{bitrate:,.0f}'
+        msg = f'received: {self.sent//1000:,} kB, '
+        msg += f'CA rate: {byterate:,.0f} kB/s, {byterate * 8:,.0f} kb/s'
         log(f'\r {msg} {10 * " "}\r')
 
 
