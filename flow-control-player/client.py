@@ -36,11 +36,14 @@ class Sender:
             self.sent += self.sock.send(data)
             self.show_stats()
 
-    def show_stats(self):
+    def rate_kBps(self):
         elapsed = time.time() - self.start_time
-        byterate = self.sent / elapsed / 1000
-        msg = f'received: {self.sent//1000:,} kB, '
-        msg += f'CA rate: {byterate:,.0f} kB/s, {byterate * 8:,.0f} kb/s'
+        return self.sent / elapsed / 1000
+
+    def show_stats(self):
+        rate = self.rate_kBps()
+        msg = f'sent: {self.sent//1000:,} kB, '
+        msg += f'CA rate: {rate:,.0f} kB/s'
         log(f'\r {msg} {10 * " "}\r')
 
 

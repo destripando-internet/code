@@ -1,6 +1,4 @@
 set datafile separator ","
-
-set datafile separator ","
 set terminal pngcairo size 1280,720 enhanced font 'Arial,16'
 set output "sent.png"
 

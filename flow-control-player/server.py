@@ -5,6 +5,7 @@ import socket
 import time
 import math
 import collections
+import atexit
 
 
 def log(msg):
@@ -40,7 +41,7 @@ class SMA:
         now = time.time()
         self.window.append((now, sent_bytes))
 
-        # Eliminar datos fuera de la ventana
+        # Remove old data outside the window
         while self.window and (now - self.window[0][0]) > self.window_size:
             self.window.popleft()
 
@@ -53,6 +54,22 @@ class SMA:
         return window_bytes / elapsed / 1000 if elapsed > 0 else 0
 
 
+class RateTrace:
+    def __init__(self):
+        self.start = self.last = time.time()
+        self.file = open('stats.csv', 'w')
+        atexit.register(self.file.close)
+
+    def update(self, sma, ema):
+        now = time.time()
+        if now - self.last < 0.001:
+            return
+        elapsed = now - self.start
+        self.last = now
+        self.file.write(f'{elapsed:.3f},{sma:.3f},{ema:.3f}\n')
+        self.file.flush()
+
+
 class Receiver:
     def __init__(self, port):
         self.sock = socket.socket()
@@ -60,6 +77,7 @@ class Receiver:
         self.sock.setsockopt(socket.SOL_SOCKET, socket.SO_RCVBUF, 4096)
         self.sock.bind(('', port))
         self.sock.listen(1)
+        self.trace = RateTrace()
 
     def run(self):
         self.child, client = self.sock.accept()
@@ -84,14 +102,15 @@ class Receiver:
             self.received += len(data)
             self.ema.update(len(data))
             self.sma.update(len(data))
+            self.trace.update(self.sma.rate_kBps(), self.ema.rate_kBps())
             self.show_stats()
 
             sys.stdout.buffer.write(data)
             sys.stdout.buffer.flush()
 
     def show_stats(self):
-        ema_rate = self.ema.rate_kBps()
         sma_rate = self.sma.rate_kBps()
+        ema_rate = self.ema.rate_kBps()
         msg = f'received: {self.received//1000:,} kB, '
         msg += f'EMA: {ema_rate:,.1f} kB/s, SMA: {sma_rate:,.1f} kB/s'
         log(f'\r {msg} {10 * " "}\r')
