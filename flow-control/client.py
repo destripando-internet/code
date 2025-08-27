@@ -3,9 +3,9 @@
 
 import sys
 import socket
-import time
 import itertools
 import atexit
+from time import sleep, monotonic
 
 BLOCK = 10000 * b'x'
 
@@ -19,20 +19,18 @@ def log(msg):
 
 class RateTrace:
     def __init__(self):
-        self.sent = 0
-        self.start = self.last = time.time()
+        self.start = self.last = monotonic()
         self.file = open('stats.csv', 'w')
         atexit.register(self.file.close)
 
     def update(self, bytes_sent, rate):
-        now = time.time()
-        if now - self.last < 0.001:
-            return
+        now = monotonic()
         elapsed = now - self.start
+        if elapsed < 0.01:
+            return
         self.last = now
         self.file.write(f'{elapsed:.3f},{bytes_sent},{rate:.3f}\n')
         self.file.flush()
-        self.sent = bytes_sent
 
 
 class Sender:
@@ -44,28 +42,30 @@ class Sender:
         self.trace = RateTrace()
 
     def run(self):
-        self.sent = 0
-        self.start_time = time.time()
-
         try:
             self.sending()
         except KeyboardInterrupt:
             self.sock.close()
 
     def sending(self):
+        self.sent = 0
+        self.start_time = monotonic()
         while 1:
-            rate = self.show_stats()
-            self.sent += self.sock.send(BLOCK)
-            self.trace.update(self.sent, rate)
+            self.sock.sendall(BLOCK)
+            self.sent += len(BLOCK)
+            self.current_rate = self.rate_kBps()
+            self.trace.update(self.sent, self.current_rate)
+            self.show_stats()
+
+    def rate_kBps(self):
+        elapsed = monotonic() - self.start_time
+        return self.sent // 1000 / elapsed
 
     def show_stats(self):
-        elapsed = time.time() - self.start_time
-        rate = self.sent/1000/elapsed
-        msg = f'sent:{self.sent//1000:,} kB, '
-        msg += f'rate:{rate:,.0f} kB/s'
+        msg = f'sent:{self.sent / 1000:,} kB, '
+        msg += f'rate:{self.current_rate:,.1f} kB/s'
         log(f'\r ({next(rotating)}) {msg} {10 * " "}\r')
-        time.sleep(0.01)
-        return rate
+        sleep(0.001)
 
 
 if len(sys.argv) != 3:
