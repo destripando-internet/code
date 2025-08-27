@@ -1,7 +1,7 @@
 Control de flujo multimedia
 ---------------------------
 
-El servidor adapta automáticamente la tasa de recepción el bitrate que corresponda al fichero .mp3 que se envíe, debido a la tasa de consumo del reproductor.
+Debido a la tasa de consumo del reproductor, el servidor adapta automáticamente la tasa de recepción al bitrate del fichero .mp3 que se envíe. Y como consecuencia también la adapta el cliente.
 
 Ejecuta estos comandos en terminales diferentes.
 
