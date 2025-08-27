@@ -80,7 +80,7 @@ class Receiver:
         self.trace = RateTrace()
 
     def run(self):
-        self.child, client = self.sock.accept()
+        self.conn, client = self.sock.accept()
         self.start_time = time.time()
 
         try:
@@ -95,7 +95,7 @@ class Receiver:
         self.ema = EMA()
         self.sma = SMA()
         while 1:
-            data = self.child.recv(1024)
+            data = self.conn.recv(1024)
             if not data:
                 break
 
