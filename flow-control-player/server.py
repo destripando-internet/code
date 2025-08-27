@@ -2,10 +2,10 @@
 
 import sys
 import socket
-import time
 import math
 import collections
 import atexit
+from time import sleep, monotonic
 
 
 def log(msg):
@@ -17,16 +17,16 @@ class EMA:
     def __init__(self):
         self.rate = 0
         self.tau = 1.0
-        self.last = time.time()
+        self.last = monotonic()
 
     def _alpha(self, dt):
         return 1.0 - math.exp(-dt / self.tau) if dt > 0 else 1.0
 
     def update(self, sent_bytes):
-        dt = time.time() - self.last
+        dt = monotonic() - self.last
         alpha = self._alpha(dt)
         self.rate = alpha * sent_bytes / dt + (1 - alpha) * self.rate
-        self.last = time.time()
+        self.last = monotonic()
 
     def rate_kBps(self):
         return self.rate / 1000
@@ -38,7 +38,7 @@ class SMA:
         self.window = collections.deque()
 
     def update(self, sent_bytes):
-        now = time.time()
+        now = monotonic()
         self.window.append((now, sent_bytes))
 
         # Remove old data outside the window
@@ -56,17 +56,17 @@ class SMA:
 
 class RateTrace:
     def __init__(self):
-        self.start = self.last = time.time()
+        self.start = self.last = monotonic()
         self.file = open('stats.csv', 'w')
         atexit.register(self.file.close)
 
-    def update(self, sma, ema):
-        now = time.time()
-        if now - self.last < 0.001:
-            return
+    def update(self, bytes_sent, rate):
+        now = monotonic()
         elapsed = now - self.start
+        if elapsed < 0.01:
+            return
         self.last = now
-        self.file.write(f'{elapsed:.3f},{sma:.3f},{ema:.3f}\n')
+        self.file.write(f'{elapsed:.3f},{bytes_sent},{rate:.3f}\n')
         self.file.flush()
 
 
@@ -81,7 +81,7 @@ class Receiver:
 
     def run(self):
         self.conn, client = self.sock.accept()
-        self.start_time = time.time()
+        self.start_time = monotonic()
 
         try:
             self.receiving()
@@ -109,11 +109,11 @@ class Receiver:
             sys.stdout.buffer.flush()
 
     def show_stats(self):
-        sma_rate = self.sma.rate_kBps()
-        ema_rate = self.ema.rate_kBps()
         msg = f'received: {self.received//1000:,} kB, '
-        msg += f'EMA: {ema_rate:,.1f} kB/s, SMA: {sma_rate:,.1f} kB/s'
+        msg += f'EMA: {self.sma.rate_kBps():,.1f} kB/s, '
+        msg += f'SMA: {self.ema.rate_kBps():,.1f} kB/s'
         log(f'\r {msg} {30 * " "}\r')
+        sleep(0.001)
 
 
 if len(sys.argv) != 2:

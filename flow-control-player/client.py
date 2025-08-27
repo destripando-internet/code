@@ -2,7 +2,7 @@
 
 import sys
 import socket
-import time
+from time import sleep, monotonic
 
 
 def log(msg):
@@ -18,7 +18,7 @@ class Sender:
 
     def run(self):
         self.sent = 0
-        self.start_time = time.time()
+        self.start_time = monotonic()
 
         try:
             self.sending()
@@ -37,14 +37,15 @@ class Sender:
             self.show_stats()
 
     def rate_kBps(self):
-        elapsed = time.time() - self.start_time
+        elapsed = monotonic() - self.start_time
         return self.sent / elapsed / 1000
 
     def show_stats(self):
         rate = self.rate_kBps()
         msg = f'sent: {self.sent//1000:,} kB, '
-        msg += f'CA rate: {rate:,.0f} kB/s'
+        msg += f'CA rate: {rate:,.1f} kB/s'
         log(f'\r {msg} {10 * " "}\r')
+        sleep(0.001)
 
 
 if len(sys.argv) != 3:
