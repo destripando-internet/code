@@ -1,16 +1,17 @@
-Flow control for media stream
------------------------------
+Control de flujo multimedia
+---------------------------
 
-The server's receiving rate automatically adapts to the MP3 player's bitrate thanks to flow control.
+El servidor adapta automáticamente la tasa de recepción el bitrate que corresponda al fichero .mp3 que se envíe, debido a la tasa de consumo del reproductor.
 
-run server:
+Ejecuta estos comandos en terminales diferentes.
 
-```
-$ ./server.py 2000 | mplayer -quiet -
-```
+Servidor:
 
-run client:
+    $ ./server.py 2000 | mpg123 --quiet -
 
-```
-$ ./client.py localhost 2000 < audio.mp3
-```
+Cliente:
+
+    $ ./client.py localhost 2000 < song.mp3
+
+
+El servidor genera un fichero stats.csv, que puedes procesar con `gnuplot rate.gp` para generar una gráfica.

@@ -113,7 +113,7 @@ class Receiver:
         ema_rate = self.ema.rate_kBps()
         msg = f'received: {self.received//1000:,} kB, '
         msg += f'EMA: {ema_rate:,.1f} kB/s, SMA: {sma_rate:,.1f} kB/s'
-        log(f'\r {msg} {10 * " "}\r')
+        log(f'\r {msg} {30 * " "}\r')
 
 
 if len(sys.argv) != 2:

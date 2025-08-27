@@ -3,8 +3,9 @@ set terminal pngcairo size 1280,720 enhanced font 'Arial,16'
 set output "rate.png"
 
 set xlabel "time (s)"
-set ylabel "rate (B/s)"
+set ylabel "rate (B/s, log10)"
 set logscale y
+set format y "10^{%L}"
 set key top right
 
 plot "stats.csv" using 1:2 with lines lw 3 title "SMA", \
