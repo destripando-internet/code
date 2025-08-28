@@ -60,13 +60,11 @@ class RateTrace:
         self.file = open('stats.csv', 'w')
         atexit.register(self.file.close)
 
-    def update(self, bytes_sent, rate):
+    def update(self, sma, ema):
         now = monotonic()
         elapsed = now - self.start
-        if elapsed < 0.01:
-            return
         self.last = now
-        self.file.write(f'{elapsed:.3f},{bytes_sent},{rate:.3f}\n')
+        self.file.write(f'{elapsed:.3f},{sma:.3f},{ema:.3f}\n')
         self.file.flush()
 
 
