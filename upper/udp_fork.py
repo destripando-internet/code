@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 # Copyright: See AUTHORS and COPYING
-"Usage: {0} <port>"
 
 import sys
 import os
@@ -8,18 +7,15 @@ import time
 import socket
 
 
-class ProcessPool(object):
+class ProcessThrottler(object):
     def __init__(self, max_procs=40):
         self.max_procs = max_procs
         self.procs = []
 
     def collect_children(self):
+        # from socketserver module
         while self.procs:
-            if len(self.procs) < self.max_procs:
-                opts = os.WNOHANG
-            else:
-                opts = 0
-
+            opts = os.WNOHANG if len(self.procs) < self.max_procs else 0
             pid, status = os.waitpid(0, opts)
             if not pid:
                 break
@@ -50,7 +46,7 @@ def main(port):
     sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     sock.bind(('', port))
 
-    pool = ProcessPool()
+    pool = ProcessThrottler()
     n = 0
 
     while 1:
@@ -59,7 +55,7 @@ def main(port):
 
 
 if len(sys.argv) != 2:
-    print(__doc__.format(sys.argv[0]))
+    print("Usage: {0} <port>".format(sys.argv[0]))
     sys.exit(1)
 
 try:
