@@ -24,7 +24,7 @@ def handle(msg, client, n):
 
 
 def responder(sock):
-    while True:
+    while 1:
         response, client = output_queue.get()
         sock.sendto(response, client)
 
@@ -37,7 +37,7 @@ def main(port):
 
     with ThreadPoolExecutor(max_workers=MAX_THREADS) as executor:
         n = 0
-        while True:
+        while 1:
             msg, client = sock.recvfrom(1024)
             executor.submit(handle, msg, client, n := n+1)
 

@@ -46,12 +46,13 @@ def main(port):
     sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     sock.bind(('', port))
 
-    pool = ProcessThrottler()
+    throttler = ProcessThrottler()
     n = 0
 
     while 1:
         msg, client = sock.recvfrom(1024)
-        pool.start_new_process(handle, (sock, msg, client, n := n+1))
+        throttler.start_new_process(
+            handle, (sock, msg, client, n := n+1))
 
 
 if len(sys.argv) != 2:

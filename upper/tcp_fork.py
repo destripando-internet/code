@@ -55,12 +55,13 @@ def main(port):
     sock.bind(('', port))
     sock.listen(5)
 
-    pool = ProcessThrottler()
+    throttler = ProcessThrottler()
     n = 0
 
     while 1:
         conn, client = sock.accept()
-        pool.start_new_process(handle, (conn, client, n := n+1))
+        throttler.start_new_process(
+            handle, (conn, client, n := n+1))
 
 
 if len(sys.argv) != 2:
