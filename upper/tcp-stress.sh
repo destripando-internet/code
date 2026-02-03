@@ -1,5 +1,10 @@
 #!/bin/bash
 
+if ! command -v tmux &> /dev/null; then
+    echo "tmux is not installed. Please install tmux to continue.";
+    exit 1;
+fi
+
 if [ "$#" -ne 2 ]; then
     echo "Usage: $0 <server-script> <n_clients>"
     exit 1
