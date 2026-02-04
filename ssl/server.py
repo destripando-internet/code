@@ -4,9 +4,6 @@
 # Generate SSL certificates with: make generate-certs
 # $ openssl req -x509 -newkey rsa:4096 -keyout key.pem -out cert.pem -days 365 -nodes
 
-
-"Usage: {0} <port>"
-
 import sys
 import time
 import socket
@@ -33,7 +30,7 @@ def handle(sock, client):
 
 
 if len(sys.argv) != 2:
-    print(__doc__.format(sys.argv[0]))
+    print(f"Usage: {sys.argv[0]} <port>")
     sys.exit(1)
 
 

@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 # Copyright: See AUTHORS and COPYING
-"Usage: {0} <host> <port>"
 
 import sys
 import socket
@@ -32,7 +31,7 @@ def main(server_host, server_port):
 
 
 if len(sys.argv) != 3:
-    print(__doc__.format(sys.argv[0]))
+    print(f"Usage: {sys.argv[0]} <host> <port>")
     sys.exit(1)
 
 try:
