@@ -1,11 +1,10 @@
 ## SSL
 
+* [server][ssl-server]
 * [client][ssl-client]
-* [SSL server][ssl-server]
 
-[ssl-client]: https://github.com/destripando-internet/code/blob/master/ssl/client.py
 [ssl-server]: https://github.com/destripando-internet/code/blob/master/ssl/server.py
-
+[ssl-client]: https://github.com/destripando-internet/code/blob/master/ssl/client.py
 
 ### SSL certs
 
