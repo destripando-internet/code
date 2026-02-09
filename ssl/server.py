@@ -4,11 +4,11 @@
 # Generate SSL certificates with: make generate-certs
 # $ openssl req -x509 -newkey rsa:4096 -keyout key.pem -out cert.pem -days 365 -nodes
 
-import sys
-import time
+import signal
 import socket
 import ssl
-import signal
+import sys
+import time
 
 
 def upper(msg):
