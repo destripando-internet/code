@@ -10,7 +10,8 @@
 
 Generate CA (Certification Authority):
 
-    $ openssl req -x509 -newkey rsa:4096 -keyout ca-key.pem -out ca-cert.pem -nodes -subj "/CN=MyCA"
+    $ openssl req -x509 -newkey rsa:4096 -keyout ca-key.pem -out ca-cert.pem -nodes -subj "/CN=MyCA" \
+        -addext "keyUsage = critical,keyCertSign,cRLSign" -addext "basicConstraints = critical,CA:TRUE"
 
 * ca-key.pem: CA private key
 * ca-cert.pem: CA certificate
@@ -24,6 +25,8 @@ Generate server private key:
 
 Sign server cert with CA:
 
-    $ openssl x509 -req -in server-req.pem -CA ca-cert.pem -CAkey ca-key.pem -CAcreateserial -out server-cert.pem
+    $ openssl x509 -req -in server-req.pem -CA ca-cert.pem -CAkey ca-key.pem -CAcreateserial \
+        -out server-cert.pem -days 365 -copy_extensions copyall
+
 
 * server-cert.pem: signed server certificate
