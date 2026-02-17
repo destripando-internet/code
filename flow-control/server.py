@@ -59,7 +59,7 @@ class Receiver:
 
 
 if len(sys.argv) != 3:
-    print('Usage: server.py <port> <rx_limit>')
+    print('Usage: server.py <port> <rx_limit_kBps>')
     sys.exit(1)
 
 port = int(sys.argv[1])
