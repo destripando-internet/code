@@ -20,7 +20,7 @@ class Receiver:
         self.sock.bind(('', port))
         self.sock.listen(1)
 
-        if step_size_kB != 0:
+        if step_size_kB:
             self.receiving_method = self.step_receiving
         else:
             self.receiving_method = self.limited_receiving
