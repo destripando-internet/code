@@ -1,5 +1,6 @@
+PNG := client-rate.png client-sent.png server-rate.png
 
-all: client-rate.png client-sent.png server-rate.png
+all: $(PNG)
 
 client-rate.png: client-rate.gp client-stats.csv
 	gnuplot $<
@@ -9,3 +10,7 @@ client-sent.png: client-sent.gp client-stats.csv
 
 server-rate.png: server-rate.gp server-stats.csv
 	gnuplot $<
+
+
+clean:
+	rm -f $(PNG)

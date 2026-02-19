@@ -30,7 +30,7 @@ class CA_RateMeter:
         self.rate = self.bytes_from_start / self.elapsed
 
     def __str__(self):
-        return f'CA: {self.rate / 1000:.1f} kB/s'
+        return f'CA:{self.rate / 1000:.1f} kB/s'
 
 
 class EMA_RateMeter:
@@ -49,7 +49,7 @@ class EMA_RateMeter:
         self.last = monotonic()
 
     def __str__(self):
-        return f'EMA: {self.rate / 1000:.1f} kB/s'
+        return f'EMA:{self.rate / 1000:.1f} kB/s'
 
 
 class SMA_RateMeter:
@@ -75,7 +75,7 @@ class SMA_RateMeter:
         return window_bytes / elapsed if elapsed > 0 else 0
 
     def __str__(self):
-        return f'SMA: {self.rate // 1000:.1f} kB/s'
+        return f'SMA:{self.rate // 1000:.1f} kB/s'
 
 
 class RateTrace:
@@ -93,19 +93,21 @@ class RateTrace:
 
 
 class Receiver:
-    def __init__(self, port, target_rate_kBps, rcvbuf_B, step_size_kB, use_stdout=False):
-        self.target_rate = target_rate_kBps * 1000 if target_rate_kBps > 0 else None
-        self.rcvbuf_B = rcvbuf_B
-        self.step_size = step_size_kB
-        self.use_stdout = use_stdout
-        if step_size_kB:
+    def __init__(self, args):
+        self.target_rate = args.limit * 1000 if args.limit > 0 else None
+        self.rcvbuf_B = args.rcvbuf
+        self.step_size = args.step
+        self.use_stdout = args.stdout
+        self.show_ema = args.ema
+        self.show_sma = args.sma
+        if args.step:
             self.receiving_method = self.step_receiving
         else:
             self.receiving_method = self.limited_receiving
 
         self.sock = socket.socket()
         self.sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-        self.sock.bind(('', port))
+        self.sock.bind(('', args.port))
         self.sock.listen(1)
         self.trace = RateTrace()
 
@@ -171,7 +173,11 @@ class Receiver:
 
     def show_stats(self):
         msg = f'received:{self.ca.bytes_from_start / 1000:,.1f} kB, '
-        msg += f'{self.ca}, {self.ema}, {self.sma}'
+        msg += f'{self.ca}'
+        if self.show_ema:
+            msg += f', {self.ema}'
+        if self.show_sma:
+            msg += f', {self.sma}'
         eprint(f'\r {msg} {10 * " "}', end='\r')
         sleep(0.001)
 
@@ -193,6 +199,10 @@ if __name__ == '__main__':
         help='Set receive buffer size bytes (default: system default)')
     parser.add_argument(
         '--stdout', action='store_true',  help='Print data to stdout')
+    parser.add_argument(
+        '--ema', action='store_true', help='Show EMA rate')
+    parser.add_argument(
+        '--sma', action='store_true', help='Show SMA rate')
 
     args = parser.parse_args()
-    Receiver(args.port, args.limit, args.rcvbuf, args.step, args.stdout).run()
+    Receiver(args).run()
