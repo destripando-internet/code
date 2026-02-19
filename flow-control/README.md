@@ -24,6 +24,10 @@ Puedes generar gráficas con los datos enviados y la tasa de envío a partir del
     $ gnuplot client-sent.gp
     $ gnuplot client-rate.gp
 
+<img src="client-sent.png" width="70%">
+
+<img src="client-rate.png" width="70%">
+
 Y puedes ver información sobre el socket con:
 
     $ ss -timon sport = 2000 or dport = 2000
@@ -32,7 +36,7 @@ Y puedes ver información sobre el socket con:
 Reproductor multimedia
 ----------------------
 
-Por defecto el cliente solo envía datos de relleno, pero es posible indicarle que lea datos desde su entrada estándar con la opción `--stdin`. Por su parte el servidor descarta lo que recibe, pero también es posible indicar que envíe los datos a su salida estándar con `--stdout`. Este te permite usar esta conexión para enviar un flujo multimedia.
+Por defecto el cliente solo envía datos de relleno, pero es posible indicarle que lea datos desde su entrada estándar con la opción `--stdin`. Por su parte el servidor descarta lo que recibe, pero también es posible indicar que envíe los datos a su salida estándar con `--stdout`. Este te permite usar esta conexión para enviar, por ejemplo, un flujo multimedia.
 
 La entrada del cliente se puede redirigir desde un fichero .mp3, mientras que la salida del servidor se puede enviar a un reproductor. Con ello, la tasa de recepción se adapta automáticamente al bitrate del fichero mp3 que estés enviando, lo que a su vez limita la tasa de envío del cliente. Utiliza estos comandos:
 
@@ -48,4 +52,6 @@ Cliente:
 
 Las opciones --rcvbuf y --sndbuf fijan los tamaños de los buffers de recepción y envío de servidor y cliente.
 
-El servidor genera un fichero `server-stats.csv`, que puedes procesar con `gnuplot server-rate.gp` para generar una gráfica.
+El servidor genera un fichero `server-stats.csv`, que puedes procesar con `gnuplot server-rate.gp` para generar una gráfica que compara las tasas promedio acumulativo (CA), media móvil exponencial (EMA) y media móvil simple (SMA).
+
+<img src="server-rate.png" width="70%">
