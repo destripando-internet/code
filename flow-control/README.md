@@ -32,7 +32,7 @@ Y puedes ver información sobre el socket con:
 Reproductor multimedia
 ----------------------
 
-Por defecto el cliente solo envía basura, pero es posible indicarle que lea datos desde su entrada estándar con la opción --stdin. Por su parte el servidor descarta lo que recibe, pero también es posible indicar que envíe los datos a su salida estándar con --stdout. Este te permite usar esta conexión para enviar un flujo multimedia.
+Por defecto el cliente solo envía datos de relleno, pero es posible indicarle que lea datos desde su entrada estándar con la opción --stdin. Por su parte el servidor descarta lo que recibe, pero también es posible indicar que envíe los datos a su salida estándar con --stdout. Este te permite usar esta conexión para enviar un flujo multimedia.
 
 La entrada del cliente se puede redirigir desde un fichero .mp3, mientras que la salida del servidor se puede enviar a un reproductor. Con ello, la tasa de recepción se adapta automáticamente al bitrate del fichero mp3 que estés enviando, lo que a su vez limita la tasa de envío del cliente. Utiliza estos comandos:
 
