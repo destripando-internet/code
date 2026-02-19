@@ -17,6 +17,6 @@ tmux bind-key x kill-session
 tmux set-option -g set-titles off
 
 tmux split-window -h
-tmux send-keys -t session:0.0 "./$SERVER 2000" C-m
-tmux send-keys -t session:0.1 "sleep 1; ./$CLIENT localhost 2000" C-m
+tmux send-keys -t session:0.0 "./$SERVER 2000 --limit 200" C-m
+tmux send-keys -t session:0.1 "sleep 1; ./$CLIENT 127.0.0.1 2000" C-m
 tmux attach-session -t session
