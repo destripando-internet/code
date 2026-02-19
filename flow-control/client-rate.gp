@@ -1,13 +1,13 @@
 set datafile separator ","
-set logscale y
-set format y "10^{%L}"
 
 # set mytics 10
 # set grid xtics ytics mytics
 # set grid lw 1 lc rgb "gray30", lw 0.5 lc rgb "gray90"
 
 set xlabel "time (s)"
-set ylabel "rate (kB/s)"
+set ylabel "rate (kB/s, log10)"
+set logscale y
+set format y "10^{%L}"
 # set yrange [0:1400]
 unset key
 
