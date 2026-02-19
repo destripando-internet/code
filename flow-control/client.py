@@ -44,7 +44,8 @@ class Sender:
     def run(self):
         try:
             self.sending()
-        except KeyboardInterrupt:
+        except (KeyboardInterrupt, socket.error) as e:
+            print(f"\nShutting down client. {e}")
             self.sock.close()
 
     def sending(self):
