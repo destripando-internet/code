@@ -5,16 +5,22 @@
     unset -f $(compgen -A function)
     export PS1='$ '
 
-    tmux -f .tmux.conf new-session -d -s session
-    tmux -f .tmux.conf split-window -h -t session:0
+    set -g mouse on
+    setw -g monitor-activity on
+    set -g visual-activity on
+    bind-key x kill-session
+    set-option -g set-titles off
 
-    tmux -f .tmux.conf split-window -v -t session:0.1
-    tmux -f .tmux.conf split-window -v -t session:0.2
+    tmux  new-session -d -s session
+    tmux  split-window -h -t session:0
 
-    tmux -f .tmux.conf send-keys -t session:0.0 "./chatroom-broker.py" C-m
-    tmux -f .tmux.conf send-keys -t session:0.1 "sleep 1; ./chatroom-member.py" C-m
-    tmux -f .tmux.conf send-keys -t session:0.2 "sleep 1; ./chatroom-member.py" C-m
-    tmux -f .tmux.conf send-keys -t session:0.3 "sleep 1; ./chatroom-member.py" C-m
+    tmux  split-window -v -t session:0.1
+    tmux  split-window -v -t session:0.2
 
-    tmux -f .tmux.conf attach-session -t session
+    tmux  send-keys -t session:0.0 "./chatroom-broker.py" C-m
+    tmux  send-keys -t session:0.1 "sleep 1; ./chatroom-member.py" C-m
+    tmux  send-keys -t session:0.2 "sleep 1; ./chatroom-member.py" C-m
+    tmux  send-keys -t session:0.3 "sleep 1; ./chatroom-member.py" C-m
+
+    tmux  attach-session -t session
 )
