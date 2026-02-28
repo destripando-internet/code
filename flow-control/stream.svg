@@ -7,7 +7,7 @@
    viewBox="0 0 209.99999 24.471"
    version="1.1"
    id="svg6056"
-   inkscape:version="1.4 (e7c3feb100, 2024-10-09)"
+   inkscape:version="1.4.2 (ebf0e940d0, 2025-05-08)"
    sodipodi:docname="stream.svg"
    inkscape:export-filename="/home/anarubioruiz/Repositories/net-book/figures/rect182488.png"
    inkscape:export-xdpi="300"
@@ -404,13 +404,13 @@
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
      inkscape:zoom="1.5913086"
-     inkscape:cx="397.15741"
-     inkscape:cy="-3.1420681"
+     inkscape:cx="383.33231"
+     inkscape:cy="-3.4562749"
      inkscape:document-units="mm"
      inkscape:current-layer="layer5"
      showgrid="false"
-     inkscape:window-width="2560"
-     inkscape:window-height="1375"
+     inkscape:window-width="1920"
+     inkscape:window-height="1003"
      inkscape:window-x="0"
      inkscape:window-y="0"
      inkscape:window-maximized="1"
@@ -621,45 +621,41 @@
            y="10.027303">socket.send()</tspan></text>
     </g>
     <g
-       id="g1"
-       transform="translate(-1.821596)">
-      <g
-         id="g27"
-         transform="matrix(0.67804003,0,0,0.67567249,-19.735413,1.1291972)"
-         style="stroke-width:1.47742">
-        <path
-           style="fill:none;stroke:#000000;stroke-width:1.95451;stroke-linecap:butt;stroke-linejoin:miter;stroke-dasharray:none;stroke-opacity:1;marker-end:url(#ConcaveTriangle)"
-           d="m 191.42565,18.233357 h 8.67067"
-           id="path25" />
-        <text
-           xml:space="preserve"
-           style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:6.25442px;line-height:0;font-family:Ubuntu;-inkscape-font-specification:'Ubuntu Bold';letter-spacing:0px;word-spacing:0px;stroke-width:0.3909"
-           x="178.76265"
-           y="10.027303"
-           id="text26"><tspan
-             sodipodi:role="line"
-             id="tspan26"
-             style="font-style:normal;font-variant:normal;font-weight:500;font-stretch:normal;font-size:6.25442px;font-family:Inconsolata;-inkscape-font-specification:'Inconsolata Medium';stroke-width:0.3909"
-             x="178.76265"
-             y="10.027303">socket.recv()</tspan></text>
-      </g>
+       id="g27"
+       transform="matrix(0.67804003,0,0,0.67567249,-21.557009,1.1291972)"
+       style="stroke-width:1.47742">
+      <path
+         style="fill:none;stroke:#000000;stroke-width:1.95451;stroke-linecap:butt;stroke-linejoin:miter;stroke-dasharray:none;stroke-opacity:1;marker-end:url(#ConcaveTriangle)"
+         d="m 191.42565,18.233357 h 8.67067"
+         id="path25" />
       <text
          xml:space="preserve"
-         style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:4.23333px;line-height:1;font-family:Ubuntu;-inkscape-font-specification:'Ubuntu Bold';text-align:center;letter-spacing:0px;word-spacing:0px;text-anchor:middle;stroke-width:0.264583"
-         x="119.91521"
-         y="21.571058"
-         id="text27"
-         transform="scale(1.0017505,0.99825257)"><tspan
+         style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:6.25442px;line-height:0;font-family:Ubuntu;-inkscape-font-specification:'Ubuntu Bold';letter-spacing:0px;word-spacing:0px;stroke-width:0.3909"
+         x="178.76265"
+         y="10.027303"
+         id="text26"><tspan
            sodipodi:role="line"
-           id="tspan27"
-           style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:4.23333px;line-height:1;font-family:Ubuntu;-inkscape-font-specification:'Ubuntu Bold';text-align:center;text-anchor:middle;stroke-width:0.264583"
-           x="119.91521"
-           y="21.571058">limitado</tspan><tspan
-           sodipodi:role="line"
-           style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:4.23333px;line-height:1;font-family:Ubuntu;-inkscape-font-specification:'Ubuntu Bold';text-align:center;text-anchor:middle;stroke-width:0.264583"
-           x="119.91521"
-           y="25.804388"
-           id="tspan28">a 200 kB/s</tspan></text>
+           id="tspan26"
+           style="font-style:normal;font-variant:normal;font-weight:500;font-stretch:normal;font-size:6.25442px;font-family:Inconsolata;-inkscape-font-specification:'Inconsolata Medium';stroke-width:0.3909"
+           x="178.76265"
+           y="10.027303">socket.recv()</tspan></text>
     </g>
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:4.23333px;line-height:1;font-family:Ubuntu;-inkscape-font-specification:'Ubuntu Bold';text-align:center;letter-spacing:0px;word-spacing:0px;text-anchor:middle;stroke-width:0.264583"
+       x="113.08092"
+       y="21.571058"
+       id="text27"
+       transform="scale(1.0017505,0.99825256)"><tspan
+         sodipodi:role="line"
+         id="tspan27"
+         style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:4.23333px;line-height:1;font-family:Ubuntu;-inkscape-font-specification:'Ubuntu Bold';text-align:center;text-anchor:middle;stroke-width:0.264583"
+         x="113.08092"
+         y="21.571058">limitado</tspan><tspan
+         sodipodi:role="line"
+         style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:4.23333px;line-height:1;font-family:Ubuntu;-inkscape-font-specification:'Ubuntu Bold';text-align:center;text-anchor:middle;stroke-width:0.264583"
+         x="113.08092"
+         y="25.804388"
+         id="tspan28">a 200 kB/s</tspan></text>
   </g>
 </svg>
