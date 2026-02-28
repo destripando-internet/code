@@ -1,0 +1,18 @@
+services:
+  dnsmasq:
+    build: .
+    container_name: dnsmasq
+    volumes:
+      - ./dnsmasq.conf:/etc/dnsmasq.conf:ro
+    networks:
+      dnsmasq_net:
+        ipv4_address: 192.168.2.1
+    ports:
+      - "67:67/udp"
+    cap_add:
+      - NET_ADMIN
+    restart: unless-stopped
+
+networks:
+  dnsmasq_net:
+    external: true
