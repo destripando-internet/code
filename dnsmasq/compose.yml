@@ -15,4 +15,7 @@ services:
 
 networks:
   dnsmasq_net:
-    external: true
+    ipam:
+      config:
+        - subnet: 192.168.2.0/24
+          gateway: 192.168.2.254
