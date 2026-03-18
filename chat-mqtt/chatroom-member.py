@@ -11,10 +11,7 @@ QUIT  = 'bye'
 
 class ChatroomMember:
     def __init__(self, broker, nick):
-        self.client = mqtt.Client(mqtt.CallbackAPIVersion.VERSION2)
-        self.client.on_connect = self.on_connect
-        self.client.on_message = self.on_message
-        self.client.connect(*broker)
+        self.broker = broker
         self.nick = nick
 
     def on_connect(self, client, userdata, flags, reason_code, properties):
@@ -28,9 +25,13 @@ class ChatroomMember:
         print("{}: {}".format(data['nick'], data['message']))
 
     def run(self):
+        self.client = mqtt.Client(mqtt.CallbackAPIVersion.VERSION2)
+        self.client.on_connect = self.on_connect
+        self.client.on_message = self.on_message
+        self.client.connect(*self.broker)
         self.client.loop_start()
 
-        while True:
+        while 1:
             line = input()
             if line == QUIT:
                 break
@@ -45,9 +46,8 @@ class ChatroomMember:
 if len(sys.argv) != 3:
     exit("Usage: ./chatroom-member.py <broker_address> <nick>")
 
-broker = (sys.argv[1], 1883)
-
 try:
+    broker = (sys.argv[1], 1883)
     ChatroomMember(broker, nick=sys.argv[2]).run()
 except (KeyboardInterrupt, EOFError):
     print("shut down.")
