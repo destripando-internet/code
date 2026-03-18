@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 # Copyright: See AUTHORS and COPYING
 
+import json
 import sys
 import paho.mqtt.client as mqtt
 
@@ -20,7 +21,11 @@ class ChatroomMember:
         self.client.subscribe(TOPIC)
 
     def on_message(self, client, userdata, msg):
-        print(msg.payload.decode())
+        data = json.loads(msg.payload.decode())
+        if data['nick'] == self.nick:
+            return
+
+        print("{}: {}".format(data['nick'], data['message']))
 
     def run(self):
         self.client.loop_start()
@@ -30,8 +35,8 @@ class ChatroomMember:
             if line == QUIT:
                 break
 
-            message = "{}: {}".format(self.nick, line)
-            self.client.publish(TOPIC, message)
+            payload = json.dumps({'nick': self.nick, 'message': line})
+            self.client.publish(TOPIC, payload)
 
         self.client.loop_stop()
         self.client.disconnect()
