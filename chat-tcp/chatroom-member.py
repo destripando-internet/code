@@ -4,18 +4,17 @@
 import sys
 import socket
 import selectors
-SERVER = ('', 12345)
+
 QUIT = b'bye'
 
-
 class ChatroomMember:
-    def __init__(self, peer):
+    def __init__(self, broker, nick):
         self.sock = socket.socket()
-        self.sock.connect(peer)
+        self.sock.connect(broker)
+        self.nick = nick
 
     def run(self):
-        nick = input("Enter you nick: ")
-        self.sock.sendall(nick.encode())
+        self.sock.sendall(self.nick.encode())
 
         selector = selectors.DefaultSelector()
         selector.register(sys.stdin, selectors.EVENT_READ, self.sending)
@@ -37,7 +36,12 @@ class ChatroomMember:
         return message
 
 
+if len(sys.argv) != 3:
+    exit("Usage: ./chatroom-member.py <broker_address> <nick>")
+
+broker = (sys.argv[1], 12345)
+
 try:
-    ChatroomMember(SERVER).run()
+    ChatroomMember(broker, nick=sys.argv[2]).run()
 except (KeyboardInterrupt, EOFError):
     print("shut down.")

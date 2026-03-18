@@ -3,14 +3,16 @@
 
 import socket
 import selectors
+
 QUIT = 'bye'
+PORT = 12345
 
 
 class ChatroomBroker:
     def main(self):
         with socket.socket() as self.master:
             self.master.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-            self.master.bind(('', 12345))
+            self.master.bind(('', PORT))
             self.master.listen(5)
 
             self.members = {}

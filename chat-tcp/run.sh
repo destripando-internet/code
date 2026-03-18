@@ -18,9 +18,9 @@
     tmux  split-window -v -t session:0.2
 
     tmux  send-keys -t session:0.0 "./chatroom-broker.py" C-m
-    tmux  send-keys -t session:0.1 "sleep 1; ./chatroom-member.py" C-m
-    tmux  send-keys -t session:0.2 "sleep 1; ./chatroom-member.py" C-m
-    tmux  send-keys -t session:0.3 "sleep 1; ./chatroom-member.py" C-m
+    tmux  send-keys -t session:0.1 "sleep 1; ./chatroom-member.py localhost Alice" C-m
+    tmux  send-keys -t session:0.2 "sleep 1; ./chatroom-member.py localhost Bob" C-m
+    tmux  send-keys -t session:0.3 "sleep 1; ./chatroom-member.py localhost Charlie" C-m
 
     tmux  attach-session -t session
 )
