@@ -196,7 +196,7 @@ Show OSPF info:
 
 Show OSPF database:
 
-    $ docker exec r1 vtysh -c "show ip ospf database "
+    $ docker exec r1 vtysh -c "show ip ospf database"
 
         OSPF Router with ID (10.0.4.2)
 
@@ -222,7 +222,7 @@ Neighbors:
     10.0.4.3        1 2-Way/DROther   12.526s     37.473s 10.0.4.3   eth0:10.0.4.2       0     0     0
     10.0.2.2        1 2-Way/DROther   12.654s     37.345s 10.0.1.3   eth2:10.0.1.2       0     0     0
 
-Capture RIP traffic:
+Capture OSPF traffic:
 
     $ docker exec -ti r1 tshark -i any -Y ospf -V
     Open Shortest Path First

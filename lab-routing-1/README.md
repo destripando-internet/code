@@ -18,17 +18,17 @@ Show routing tables:
 
 Ping Server:
 
-    $ ping 10.0.3.2
-    PING 10.0.3.2 (10.0.3.2) 56(84) bytes of data.
-    64 bytes from 10.0.3.2: icmp_seq=1 ttl=62 time=0.104 ms
+    $ ping 10.0.3.3
+    PING 10.0.3.3 (10.0.3.3) 56(84) bytes of data.
+    64 bytes from 10.0.3.3: icmp_seq=1 ttl=62 time=0.104 ms
 
 Traceroute Server:
 
-    $ traceroute 10.0.3.2
-    traceroute to 10.0.3.2 (10.0.3.2), 30 hops max, 60 byte packets
-    1  10.0.0.3 (10.0.0.3)  0.585 ms  0.432 ms  0.012 ms
-    2  10.0.1.3 (10.0.1.3)  0.031 ms  0.016 ms  0.010 ms
-    3  10.0.3.2 (10.0.3.2)  0.022 ms  0.013 ms  0.013 ms
+    traceroute to 10.0.3.3 (10.0.3.3), 30 hops max, 60 byte packets
+    1  10.0.0.3 (10.0.0.3)  0.118 ms  0.043 ms  0.034 ms
+    2  10.0.1.3 (10.0.1.3)  0.072 ms  0.055 ms  0.083 ms
+    3  10.0.2.3 (10.0.2.3)  0.090 ms  0.069 ms  0.069 ms
+    4  10.0.3.3 (10.0.3.3)  0.102 ms  0.087 ms  0.081 ms
 
 
 ## RIP
