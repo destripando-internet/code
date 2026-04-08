@@ -148,6 +148,7 @@ Simulate link error:
     2  10.0.4.3 (10.0.4.3)  0.019 ms  0.011 ms  0.010 ms
     3  10.0.3.3 (10.0.3.3)  0.023 ms  0.013 ms  0.012 ms
 
+    # deactivate the interface connecting R1 to R3 (name can change)
     $ docker exec r1 ip link set dev eth1 down
 
     $ traceroute 10.0.3.3
