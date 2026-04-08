@@ -139,6 +139,24 @@ Capture RIP traffic:
             Next Hop: 0.0.0.0
             Metric: 1
 
+
+Simulate link error:
+
+    $ traceroute 10.0.3.3
+    traceroute to 10.0.3.3 (10.0.3.3), 30 hops max, 60 byte packets
+    1  10.0.0.3 (10.0.0.3)  0.049 ms  0.009 ms  0.006 ms
+    2  10.0.4.3 (10.0.4.3)  0.019 ms  0.011 ms  0.010 ms
+    3  10.0.3.3 (10.0.3.3)  0.023 ms  0.013 ms  0.012 ms
+
+    $ docker exec r1 ip link set dev eth1 down
+
+    $ traceroute 10.0.3.3
+    traceroute to 10.0.3.3 (10.0.3.3), 30 hops max, 60 byte packets
+    1  10.0.0.3 (10.0.0.3)  0.052 ms  0.011 ms  0.008 ms
+    2  10.0.1.3 (10.0.1.3)  0.026 ms  0.014 ms  0.014 ms
+    3  10.0.2.3 (10.0.2.3)  0.030 ms  0.018 ms  0.017 ms
+    4  10.0.3.3 (10.0.3.3)  0.033 ms  0.024 ms  0.023 ms
+
 ## OSPFv2
 
 Docs:
