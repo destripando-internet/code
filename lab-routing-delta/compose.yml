@@ -8,8 +8,7 @@ x-common: &common-settings
 
 services:
   r1:
-    build: ./router
-    image: lab2-router
+    image: lab-delta-router
     container_name: r1
     hostname: r1
     <<: *common-settings
@@ -23,7 +22,7 @@ services:
       N4: { ipv4_address: 10.0.4.2 }
 
   r2:
-    image: lab2-router
+    image: lab-delta-router
     container_name: r2
     hostname: r2
     <<: *common-settings
@@ -36,7 +35,7 @@ services:
       N2: { ipv4_address: 10.0.2.2 }
 
   r3:
-    image: lab2-router
+    image: lab-delta-router
     container_name: r3
     hostname: r3
     <<: *common-settings
@@ -50,8 +49,7 @@ services:
       N4: { ipv4_address: 10.0.4.3 }
 
   server:
-    build: ./server
-    image: lab2-server
+    image: lab-delta-server
     container_name: server
     privileged: true
     networks:
