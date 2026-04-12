@@ -4,6 +4,7 @@ Lab Routing Delta — Mininet Topology
 Equivalent to the docker-compose lab-routing-delta lab.
 
 Topology:
+  host (anfitrión) — N0 (10.0.0.2/24)   ← namespace raíz, no virtualizado
   r1  — N0 (10.0.0.3/24), N1 (10.0.1.2/24), N4 (10.0.4.2/24)
   r2  — N1 (10.0.1.3/24), N2 (10.0.2.2/24)
   r3  — N2 (10.0.2.3/24), N3 (10.0.3.2/24), N4 (10.0.4.3/24)
@@ -44,7 +45,8 @@ class LabTopology:
         self.net = Mininet(switch=OVSSwitch, waitConnected=True)
 
     def build(self):
-        info('*** Adding routers\n')
+        info('*** Adding host (root namespace) and routers\n')
+        self.host   = self.net.addHost('host',   inNamespace=False, ip=None)
         self.r1     = self.net.addHost('r1',     cls=Router, ip=None)
         self.r2     = self.net.addHost('r2',     cls=Router, ip=None)
         self.r3     = self.net.addHost('r3',     cls=Router, ip=None)
@@ -61,6 +63,7 @@ class LabTopology:
         r1, r2, r3, server = self.r1, self.r2, self.r3, self.server
 
         #           node    segment  interface       IP/prefix
+        self.net.addLink(self.host, N0, intfName1='host-eth0', params1={'ip': '10.0.0.2/24'})
         self.net.addLink(r1, N0, intfName1='r1-eth0', params1={'ip': '10.0.0.3/24'})
         self.net.addLink(r1, N1, intfName1='r1-eth1', params1={'ip': '10.0.1.2/24'})
         self.net.addLink(r1, N4, intfName1='r1-eth2', params1={'ip': '10.0.4.2/24'})
@@ -77,15 +80,31 @@ class LabTopology:
     def start(self):
         self.net.start()
 
-        info('*** Removing default routes\n')
+        info('*** Flushing IPs from OVS bridge interfaces\n')
+        for sw in self.net.switches:
+            os.system(f'ip addr flush dev {sw.name} 2>/dev/null')
+
+        info('*** Removing default routes from virtual nodes\n')
         for node in self.net.hosts:
-            node.cmd('ip route del default 2>/dev/null; true')
+            if node.inNamespace:
+                node.cmd('ip route del default 2>/dev/null; true')
 
         info('*** Starting FRR zebra on routers\n')
         for router in (self.r1, self.r2, self.r3):
             self._start_zebra(router)
 
         self.server.cmd('ip route add default via 10.0.3.2')
+
+        info('*** Adding host route: 10.0.0.0/16 via r1\n')
+        self.host.cmd('ip route add 10.0.0.0/16 via 10.0.0.3 dev host-eth0 2>/dev/null; true')
+
+        info('*** Registering network namespaces in /var/run/netns\n')
+        os.makedirs('/var/run/netns', exist_ok=True)
+        for node in self.net.hosts:
+            if node.inNamespace:
+                ns_path = f'/var/run/netns/{node.name}'
+                if not os.path.exists(ns_path):
+                    os.symlink(f'/proc/{node.pid}/ns/net', ns_path)
 
     def run(self, routing=None):
         if routing:
@@ -94,6 +113,16 @@ class LabTopology:
         try:
             CLI(self.net)
         finally:
+            info('*** Removing host route\n')
+            self.host.cmd('ip route del 10.0.0.0/16 2>/dev/null; true')
+            info('*** Unregistering network namespaces\n')
+            for node in self.net.hosts:
+                if node.inNamespace:
+                    ns_path = f'/var/run/netns/{node.name}'
+                    try:
+                        os.unlink(ns_path)
+                    except FileNotFoundError:
+                        pass
             info('*** Stopping FRR daemons\n')
             for router in (self.r1, self.r2, self.r3):
                 self._stop_frr(router.name)
@@ -126,6 +155,7 @@ class LabTopology:
     def _start_zebra(self, router):
         run_dir = f'{FRR_RUN_BASE}-{router.name}'
         os.makedirs(run_dir, exist_ok=True)
+        os.chmod(run_dir, 0o777)
 
         conf = f'{run_dir}/zebra.conf'
         if not os.path.exists(conf):
@@ -137,6 +167,7 @@ class LabTopology:
             f' -f {conf}'
             f' -i {run_dir}/zebra.pid'
             f' -z {run_dir}/zserv.api'
+            f' --vty_socket {run_dir}'
             f' -d'
             f' > {run_dir}/zebra.log 2>&1'
         )
@@ -149,8 +180,11 @@ class LabTopology:
             f' -f {conf}'
             f' -i {run_dir}/{daemon}.pid'
             f' -z {run_dir}/zserv.api'
+            f' --vty_socket {run_dir}'
             f' -d'
+            f' > {run_dir}/{daemon}.log 2>&1'
         )
+        time.sleep(0.5)
 
     def _stop_frr(self, router_name):
         run_dir = f'{FRR_RUN_BASE}-{router_name}'
