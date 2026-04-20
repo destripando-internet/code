@@ -20,3 +20,9 @@ eigrp:
 
 clean:
 	sudo mn -c
+	sudo find /var/run/netns -maxdepth 1 -type l \( -name r1 -o -name r2 -o -name r3 -o -name server \) -delete
+
+test: clean
+	sudo python3 -m unittest -v test_topology
+
+.PHONY: test clean
