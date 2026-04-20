@@ -1,0 +1,6 @@
+zebra=yes
+mgmtd=yes
+ripd=yes
+ospfd=yes
+eigrpd=yes
+staticd=yes

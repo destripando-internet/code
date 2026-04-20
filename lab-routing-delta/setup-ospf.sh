@@ -1,5 +1,6 @@
 #!/bin/bash -
 
 for router in r1 r2 r3; do
-    docker exec $router /usr/lib/frr/ospfd -f /etc/frr/ospfd.conf -d
+    cp ospfd-$router.conf frr-$router.conf
+    docker exec $router vtysh -b
 done

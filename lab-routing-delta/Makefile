@@ -1,5 +1,6 @@
 
 up: build
+	touch frr-r1.conf frr-r2.conf frr-r3.conf
 	docker compose up --remove-orphans -d
 	sudo ./rm-bridge-addrs.sh
 	sudo ./setup-hosts.sh
