@@ -27,6 +27,21 @@ from mininet.node import Node, OVSSwitch
 
 LAB_DIR = os.path.dirname(os.path.abspath(__file__))
 FRR_RUN_BASE = '/tmp/frr'
+FRR_BIN_DIR  = '/usr/lib/frr'
+
+ROUTING_DAEMON = {'rip': 'ripd', 'ospf': 'ospfd', 'eigrp': 'eigrpd'}
+
+
+def check_frr_binaries(routing):
+    needed = ['zebra', 'mgmtd']
+    if routing in ROUTING_DAEMON:
+        needed.append(ROUTING_DAEMON[routing])
+    missing = [d for d in needed if not os.path.isfile(f'{FRR_BIN_DIR}/{d}')]
+    if missing:
+        paths = ', '.join(f'{FRR_BIN_DIR}/{d}' for d in missing)
+        print(f'ERROR: FRR binaries not found: {paths}', file=sys.stderr)
+        print('Install with: sudo apt install frr', file=sys.stderr)
+        sys.exit(1)
 
 
 class Router(Node):
@@ -79,6 +94,12 @@ class LabTopology:
 
     def start(self):
         self.net.start()
+
+        os.makedirs('/etc/frr', exist_ok=True)
+        frr_conf = '/etc/frr/frr.conf'
+        if not os.path.exists(frr_conf):
+            with open(frr_conf, 'w') as f:
+                f.write('frr defaults traditional\n')
 
         info('*** Flushing IPs from OVS bridge interfaces\n')
         for sw in self.net.switches:
@@ -141,12 +162,16 @@ class LabTopology:
             self._start_daemon('ripd', router, f'{LAB_DIR}/rip/{conf}')
 
     def setup_ospf(self):
-        for router in (self.r1, self.r2, self.r3):
-            self._start_daemon('ospfd', router, f'{LAB_DIR}/ospfd.conf')
+        for router, conf in ((self.r1, 'R1-ospfd.conf'),
+                             (self.r2, 'R2-ospfd.conf'),
+                             (self.r3, 'R3-ospfd.conf')):
+            self._start_daemon('ospfd', router, f'{LAB_DIR}/ospf/{conf}')
 
     def setup_eigrp(self):
-        for router in (self.r1, self.r2, self.r3):
-            self._start_daemon('eigrpd', router, f'{LAB_DIR}/eigrpd.conf')
+        for router, conf in ((self.r1, 'R1-eigrpd.conf'),
+                             (self.r2, 'R2-eigrpd.conf'),
+                             (self.r3, 'R3-eigrpd.conf')):
+            self._start_daemon('eigrpd', router, f'{LAB_DIR}/eigrp/{conf}')
 
     # ------------------------------------------------------------------
     # Private helpers
@@ -163,7 +188,7 @@ class LabTopology:
                 f.write('!\n')
 
         router.cmd(
-            f'/usr/lib/frr/zebra'
+            f'{FRR_BIN_DIR}/zebra'
             f' -f {conf}'
             f' -i {run_dir}/zebra.pid'
             f' -z {run_dir}/zserv.api'
@@ -171,13 +196,23 @@ class LabTopology:
             f' -d'
             f' > {run_dir}/zebra.log 2>&1'
         )
+        time.sleep(0.3)
+        router.cmd(
+            f'{FRR_BIN_DIR}/mgmtd'
+            f' -N {router.name}'
+            f' -i {run_dir}/mgmtd.pid'
+            f' -z {run_dir}/zserv.api'
+            f' --vty_socket {run_dir}'
+            f' -d'
+            f' > {run_dir}/mgmtd.log 2>&1'
+        )
         time.sleep(0.4)
 
     def _start_daemon(self, daemon, router, conf):
         run_dir = f'{FRR_RUN_BASE}-{router.name}'
         router.cmd(
-            f'/usr/lib/frr/{daemon}'
-            f' -f {conf}'
+            f'{FRR_BIN_DIR}/{daemon}'
+            f' -N {router.name}'
             f' -i {run_dir}/{daemon}.pid'
             f' -z {run_dir}/zserv.api'
             f' --vty_socket {run_dir}'
@@ -185,10 +220,22 @@ class LabTopology:
             f' > {run_dir}/{daemon}.log 2>&1'
         )
         time.sleep(0.5)
+        vtysh_input = f'{run_dir}/{daemon}.vtysh_input'
+        with open(conf) as src:
+            content = src.read()
+        with open(vtysh_input, 'w') as dst:
+            dst.write('configure terminal\n')
+            dst.write(content)
+            dst.write('\nend\n')
+        router.cmd(
+            f'vtysh --vty_socket {run_dir}'
+            f' < {vtysh_input}'
+            f' > {run_dir}/{daemon}.vtysh.log 2>&1'
+        )
 
     def _stop_frr(self, router_name):
         run_dir = f'{FRR_RUN_BASE}-{router_name}'
-        for daemon in ('eigrpd', 'ospfd', 'ripd', 'zebra'):
+        for daemon in ('eigrpd', 'ospfd', 'ripd', 'mgmtd', 'zebra'):
             pid_file = f'{run_dir}/{daemon}.pid'
             try:
                 with open(pid_file) as f:
@@ -212,6 +259,7 @@ if __name__ == '__main__':
 
     routing = next((k for k in ('static', 'rip', 'ospf', 'eigrp') if getattr(args, k)), None)
 
+    check_frr_binaries(routing)
     setLogLevel('info')
     lab = LabTopology()
     lab.build()
