@@ -7,11 +7,11 @@
 
 Setup:
 
-    $ sudo python3 topology.py --static
+    $ sudo topology.py --static
 
 Show routing tables:
 
-    $ ./mnrun.sh r1 ip route
+    mininet> r1 ip route # sudo ./mnrun.sh r1 ip route
     default via 10.0.4.3 dev r1-eth2
     10.0.0.0/24 dev r1-eth0 proto kernel scope link src 10.0.0.3
     10.0.1.0/24 dev r1-eth1 proto kernel scope link src 10.0.1.2
@@ -19,14 +19,14 @@ Show routing tables:
 
 Ping Server:
 
-    $ ping -c1 10.0.3.3
+    mininet> host ping -c1 10.0.3.3  # $ ping -c1 10.0.3.3
     PING 10.0.3.3 (10.0.3.3) 56(84) bytes of data.
     64 bytes from 10.0.3.3: icmp_seq=1 ttl=62 time=0.164 ms
 
 
 Traceroute Server:
 
-    $ traceroute 10.0.3.3
+    mininet> host traceroute 10.0.3.3 # $ traceroute 10.0.3.3
     traceroute to 10.0.3.3 (10.0.3.3), 30 hops max, 60 byte packets
     1  10.0.0.3 (10.0.0.3)  0.361 ms  0.309 ms  0.293 ms
     2  10.0.4.3 (10.0.4.3)  0.280 ms  0.252 ms  0.235 ms
@@ -41,12 +41,22 @@ Docs:
 
 Setup:
 
-    $ sudo python3 topology.py --rip
+    $ sudo topology.py --rip
 
+
+Wait convergence:
+
+    mininet> host ping 10.0.3.3  # $ ping 10.0.3.3
+    PING 10.0.3.3 (10.0.3.3) 56(84) bytes of data.
+    From 10.0.0.3 icmp_seq=1 Destination Net Unreachable
+    From 10.0.0.3 icmp_seq=2 Destination Net Unreachable
+    From 10.0.0.3 icmp_seq=3 Destination Net Unreachable
+    From 10.0.0.3 icmp_seq=4 Destination Net Unreachable
+    From 10.0.0.3 icmp_seq=43 Destination Net Unreachable
 
 Check config:
 
-    $ ./mnrun.sh r1 ip route
+    mininet> r1 ip route # $ ./mnrun.sh r1 ip route
     default via 10.0.4.3 dev r1-eth2
     10.0.0.0/24 dev r1-eth0 proto kernel scope link src 10.0.0.3
     10.0.1.0/24 dev r1-eth1 proto kernel scope link src 10.0.1.2
@@ -167,7 +177,7 @@ Docs:
 
 Setup:
 
-    $ sudo python3 topology.py --ospf
+    $ sudo topology.py --ospf
 
 Show routing info:
 
@@ -268,7 +278,7 @@ Capture OSPF traffic:
 
 Setup:
 
-    $ sudo python3 topology.py --eigrp
+    $ sudo topology.py --eigrp
 
 Check routes:
 

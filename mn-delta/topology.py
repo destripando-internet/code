@@ -147,6 +147,9 @@ class LabTopology:
             info('*** Stopping FRR daemons\n')
             for router in (self.r1, self.r2, self.r3):
                 self._stop_frr(router.name)
+            if routing in ('ospf', 'rip', 'eigrp'):
+                daemon = {'ospf': 'ospfd', 'rip': 'ripd', 'eigrp': 'eigrpd'}[routing]
+                self._frr_daemon_set(daemon, False)
             self.net.stop()
 
     def setup_static(self):
@@ -156,26 +159,39 @@ class LabTopology:
         self.r3.cmd('ip route add default via 10.0.4.2')
 
     def setup_rip(self):
+        self._frr_daemon_set('ripd', True)
         for router, conf in ((self.r1, 'R1-ripd.conf'),
                              (self.r2, 'R2-ripd.conf'),
                              (self.r3, 'R3-ripd.conf')):
             self._start_daemon('ripd', router, f'{LAB_DIR}/rip/{conf}')
 
     def setup_ospf(self):
-        for router, conf in ((self.r1, 'R1-ospfd.conf'),
-                             (self.r2, 'R2-ospfd.conf'),
-                             (self.r3, 'R3-ospfd.conf')):
-            self._start_daemon('ospfd', router, f'{LAB_DIR}/ospf/{conf}')
+        self._frr_daemon_set('ospfd', True)
+        for router in (self.r1, self.r2, self.r3):
+            self._start_daemon('ospfd', router, f'{LAB_DIR}/ospfd.conf')
 
     def setup_eigrp(self):
-        for router, conf in ((self.r1, 'R1-eigrpd.conf'),
-                             (self.r2, 'R2-eigrpd.conf'),
-                             (self.r3, 'R3-eigrpd.conf')):
-            self._start_daemon('eigrpd', router, f'{LAB_DIR}/eigrp/{conf}')
+        self._frr_daemon_set('eigrpd', True)
+        for router in (self.r1, self.r2, self.r3):
+            self._start_daemon('eigrpd', router, f'{LAB_DIR}/eigrpd.conf')
 
     # ------------------------------------------------------------------
     # Private helpers
     # ------------------------------------------------------------------
+
+    def _frr_daemon_set(self, daemon, enabled):
+        """Enable or disable a daemon in /etc/frr/daemons so vtysh can discover it."""
+        path = '/etc/frr/daemons'
+        try:
+            text = open(path).read()
+            old = f'{daemon}={"no" if enabled else "yes"}'
+            new = f'{daemon}={"yes" if enabled else "no"}'
+            updated = text.replace(old, new)
+            if updated != text:
+                with open(path, 'w') as f:
+                    f.write(updated)
+        except OSError:
+            pass
 
     def _start_zebra(self, router):
         run_dir = f'{FRR_RUN_BASE}-{router.name}'
