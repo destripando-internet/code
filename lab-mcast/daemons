@@ -1,0 +1,5 @@
+zebra=yes
+mgmtd=yes
+ospfd=yes
+pimd=yes
+staticd=yes
