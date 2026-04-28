@@ -10,7 +10,11 @@ down:
 
 restart: down up
 
-pim: restart
+autorp: restart
+	./setup-autorp.sh
+
+bsr: restart
+	./setup-bsr.sh
 
 build:
 	docker build -t mcast-router router

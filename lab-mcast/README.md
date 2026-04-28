@@ -14,9 +14,13 @@ Docs:
 - https://docs.frrouting.org/en/stable-10.2/pim.html
 - https://docs.frrouting.org/en/stable-10.2/ospfd.html
 
-Setup:
+Setup con Auto-RP:
 
-    $ make pim
+    $ make autorp
+
+Setup con BSR:
+
+    $ make bsr
 
 
 ### OSPF routing
@@ -116,6 +120,39 @@ El campo `Source=AutoRP` confirma que el RP se ha descubierto dinámicamente:
     $ docker exec r3 vtysh -c "show ip pim rp-info"
      RP address  group/prefix-list  OIF   I am RP  Source  Group-Type
      10.0.4.2    224.0.0.0/4        eth2  no       AutoRP  ASM
+
+
+### BSR (Bootstrap Router)
+
+R1 es el Candidate RP y R3 el Candidate BSR. Los mensajes Bootstrap se propagan en `224.0.0.13` (ALL-PIM-ROUTERS) usando PIM directamente, lo que evita el problema huevo-gallina de Auto-RP.
+
+Estado en el BSR electo (R3):
+
+    $ docker exec r3 vtysh -c "show ip pim bsr"
+    PIMv2 Bootstrap Router information
+    Current preferred BSR address: 10.0.4.3
+    Priority        Fragment-Tag       State           UpTime
+      64              25390           BSR_ELECTED      00:03:18
+    Last BSM seen: 00:00:01
+     RP address  group/prefix-list  OIF   I am RP  Source  Group-Type
+     10.0.4.2    224.0.0.0/4        eth1  no       BSR     ASM
+
+Estado en un router no-BSR (R1, R2):
+
+    $ docker exec r1 vtysh -c "show ip pim bsr"
+    PIMv2 Bootstrap Router information
+    Current preferred BSR address: 10.0.4.3
+    Priority        Fragment-Tag       State           UpTime
+      64              25390           ACCEPT_PREFERRED    00:03:18
+    Last BSM seen: 00:00:01
+     RP address  group/prefix-list  OIF   I am RP  Source  Group-Type
+     10.0.4.2    224.0.0.0/4        eth2  yes      BSR     ASM
+
+El campo `Source=BSR` en `show ip pim rp-info` confirma la convergencia:
+
+    $ docker exec r2 vtysh -c "show ip pim rp-info"
+     RP address  group/prefix-list  OIF   I am RP  Source  Group-Type
+     10.0.4.2    224.0.0.0/4        eth1  no       BSR     ASM
 
 
 ### PIM interfaces
