@@ -1,0 +1,12 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(ip link *)",
+      "Bash(sudo mn *)",
+      "Bash(docker exec *)",
+      "Bash(docker compose *)",
+      "Bash(wait)",
+      "Bash(xargs ls *)"
+    ]
+  }
+}
