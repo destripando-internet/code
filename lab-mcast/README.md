@@ -59,15 +59,63 @@ OSPF neighbors:
      eth2       10.0.4.3  00:03:47  00:01:27  1
 
 
+### Auto-RP
+
+R1 anuncia su candidatura como RP y R3 actúa como Mapping Agent. Todos los routers descubren el RP dinámicamente.
+
+Estado en el Candidate RP (R1):
+
+    $ docker exec r1 vtysh -c "show ip pim autorp"
+    AutoRP Discovery is enabled
+
+    Discovered RP's (count=1)
+     RP address  Group Range
+     10.0.4.2     224.0.0.0/4
+
+    AutoRP Announcement is enabled
+      interval 5s scope 31 holdtime 15s
+
+    Candidate RP's (count=1)
+     RP address  Group Range  Prefix-List
+     10.0.4.2    224.0.0.0/4  -
+
+    AutoRP Mapping-Agent is disabled
+
+Estado en el Mapping Agent (R3):
+
+    $ docker exec r3 vtysh -c "show ip pim autorp"
+    AutoRP Discovery is enabled
+
+    Discovered RP's (count=1)
+     RP address  Group Range
+     10.0.4.2     224.0.0.0/4
+
+    AutoRP Announcement is disabled
+
+    AutoRP Mapping-Agent is enabled
+      interval 5s scope 31 holdtime 180s
+      source 10.0.4.3 (explicit address)
+
+    Advertised RP's (count=1)
+     RP address  Group Range
+     10.0.4.2     224.0.0.0/4
+
+
 ### RP info
+
+El campo `Source=AutoRP` confirma que el RP se ha descubierto dinámicamente:
 
     $ docker exec r1 vtysh -c "show ip pim rp-info"
      RP address  group/prefix-list  OIF   I am RP  Source  Group-Type
-     10.0.4.2    224.0.0.0/4        eth2  yes      Static  ASM
+     10.0.4.2    224.0.0.0/4        eth2  yes      AutoRP  ASM
 
     $ docker exec r2 vtysh -c "show ip pim rp-info"
      RP address  group/prefix-list  OIF   I am RP  Source  Group-Type
-     10.0.4.2    224.0.0.0/4        eth0  no       Static  ASM
+     10.0.4.2    224.0.0.0/4        eth2  no       AutoRP  ASM
+
+    $ docker exec r3 vtysh -c "show ip pim rp-info"
+     RP address  group/prefix-list  OIF   I am RP  Source  Group-Type
+     10.0.4.2    224.0.0.0/4        eth2  no       AutoRP  ASM
 
 
 ### PIM interfaces
