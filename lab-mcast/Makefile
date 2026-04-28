@@ -1,6 +1,5 @@
 
 up: build
-	touch frr.conf
 	docker network prune -f
 	docker compose up --remove-orphans -d
 	sudo ./rm-bridge-addrs.sh
@@ -11,6 +10,8 @@ down:
 
 restart: down up
 
+pim: restart
+
 build:
 	docker build -t mcast-router router
 	docker build -t mcast-node node
@@ -18,5 +19,3 @@ build:
 clean: down
 	-docker rmi mcast-router mcast-node
 	-docker network prune -f
-
-pim: restart
