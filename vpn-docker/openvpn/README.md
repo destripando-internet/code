@@ -42,72 +42,78 @@ openvpn/
 
 Genera la configuración del servidor y la infraestructura PKI (CA, DH, TLS-auth):
 
-```bash
-make server-setup
-```
+    $ make server-setup
 
-Este objetivo ejecuta dos pasos dentro del contenedor servidor:
+Esto ejecuta dos pasos dentro del contenedor `server`:
 
 1. `ovpn_genconfig -u udp://vpn-server` — escribe `openvpn.conf` con el endpoint UDP.
 2. `ovpn_initpki` — crea la CA (Easy-RSA), el par de claves DH y la clave TLS-auth.
 
-> El proceso solicita una contraseña para la CA. Anótala; la necesitarás para firmar
-> certificados de cliente.
+> El proceso solicita una contraseña para la CA. Anótala; la necesitarás para firmar certificados de cliente.
 
 ### 2. Arrancar el servidor
 
-```bash
-docker compose up -d server
-```
+    $ docker compose up -d server
+    ✔ Network openvpn_default  Created
+    ✔ Container openvpn-server Started
 
 Comprueba que escucha en el puerto 1194:
 
-```bash
-docker compose logs server
-make server-shell
-server$ ip a          # debería aparecer una iface tun0 con IP 192.168.255.1
-```
+    $ docker compose logs server
+
+Comprueba su interfaz `tun0`. Debería tener la IP 92.168.255.1
+
+    $ docker compose exec server ip a show dev tun0
+    3: tun0: <POINTOPOINT,MULTICAST,NOARP,UP,LOWER_UP> mtu 1500 qdisc fq_codel
+        link/none
+        inet 192.168.255.1 peer 192.168.255.2/32 scope global tun0
+          valid_lft forever preferred_lft forever
+        inet6 fe80::c586:e778:a764:e2c3/64 scope link stable-privacy
+          valid_lft forever preferred_lft forever
+
 
 ### 3. Generar el perfil de cliente
 
-Si no quieres contraseña para la clave privada del cliente:
+Si no quieres contraseña para la clave privada del cliente (sufiente para esta demo):
 
-```bash
-make nopass-client1.ovpn
-```
+    $ make nopass-client1.ovpn
 
 Si quieres contraseña:
 
-```bash
-make client1.ovpn
-```
+    $ make client1.ovpn
 
-El perfil se guarda en `docker/client/data/client1.ovpn` e incluye los certificados y claves
-(CA, cert, key, tls-auth).
+El perfil se guarda en `docker/client/data/client1.ovpn` e incluye los certificados y claves (CA, cert, key, tls-auth).
 
 
 ### 4. Arrancar el cliente
 
-```bash
-docker compose up -d client
-```
+    $ docker compose up -d client
+    ✔ Container openvpn-client Started
 
-El cliente lanza automáticamente `openvpn --config /config/client1.ovpn`. Verifica la conexión:
+El cliente lanza automáticamente `openvpn --config /config/client1.ovpn`.
+Verifica la interaz y su IP (en el rango 192.168.255.0/24):
 
-```bash
-make client-shell
-client$ ip a                 # ebería aparecer una iface tun0 con IP 192.168.255.0/24
-client$ ping 192.168.255.1   # ping al servidor a través del túnel
-```
+    $ docker compose exec client ip a show dev tun0
+    3: tun0: <POINTOPOINT,MULTICAST,NOARP,UP,LOWER_UP> mtu 1500 qdisc fq_codel
+        link/none
+        inet 192.168.255.6 peer 192.168.255.5/32 scope global tun0
+          valid_lft forever preferred_lft forever
+        inet6 fe80::873a:1e71:94f3:6433/64 scope link stable-privacy
+          valid_lft forever preferred_lft forever
+
+Comprueba que llegas al servidor a través del túnel:
+
+    $ docker compose exec client ping 192.168.255.1 -c 2
+    PING 192.168.255.1 (192.168.255.1) 56(84) bytes of data.
+    64 bytes from 192.168.255.1: icmp_seq=1 ttl=64 time=0.190 ms
+    64 bytes from 192.168.255.1: icmp_seq=2 ttl=64 time=0.279 ms
+
 
 ## Revocar un cliente
 
-```bash
-make revoke-client
-```
+    $ make revoke-client
 
-Esto invoca `ovpn_revokeclient` dos veces: primero para revocar el certificado (actualiza
-`crl.pem`) y luego para eliminar los ficheros del cliente del volumen del servidor.
+Esto invoca `ovpn_revokeclient` dos veces: primero para revocar el certificado (actualiza `crl.pem`) y luego para eliminar los ficheros del cliente del volumen del servidor.
 
 
 ## Configuración del servidor (`openvpn.conf`)
@@ -137,9 +143,5 @@ Esto invoca `ovpn_revokeclient` dos veces: primero para revocar el certificado (
 
 ## Notas
 
-- Los datos del servidor (`pki/`, `openvpn.conf`, etc.) quedan en
-  `docker/server/data/conf/` mediante un volumen bind. No borres ese directorio si
-  quieres reutilizar la CA.
-- El perfil `client1.ovpn` incluye `redirect-gateway def1`, que hace que el cliente encamine
-  **todo** su tráfico por la VPN. Para un split-tunnel quita esa línea y añade
-  rutas específicas con `push "route ..."` en el servidor.
+- Los datos del servidor (`pki/`, `openvpn.conf`, etc.) quedan en `docker/server/data/conf/` mediante un volumen bind. No borres ese directorio si quieres reutilizar la CA.
+- El perfil `client1.ovpn` incluye `redirect-gateway def1`, que hace que el cliente encamine  **todo** su tráfico por la VPN. Para un split-tunnel quita esa línea y añade rutas específicas con `push "route ..."` en el servidor.

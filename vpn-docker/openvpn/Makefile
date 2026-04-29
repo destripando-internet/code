@@ -16,9 +16,3 @@ nopass-client1.ovpn:
 revoke-client:
 	docker compose run --rm server ovpn_revokeclient ${CLIENT}
 	docker compose run --rm server ovpn_revokeclient ${CLIENT} remove
-
-server-shell:
-	docker compose exec -it server /bin/bash
-
-client-shell:
-	docker compose exec -it client /bin/bash
