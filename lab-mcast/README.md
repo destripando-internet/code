@@ -212,6 +212,24 @@ node3 se suscribe al grupo 239.1.1.1:
     Server listening on UDP port 5001
     Joining multicast group  239.1.1.1
 
+node3 envía IGMP Membership Report para unirse al grupo.
+
+    $ docker exec r3 vtysh -c "show ip igmp groups"
+    [se muestran solo las entradas nuevas]
+    eth2             239.1.1.1       EXCL 00:03:57    1 3 00:00:23
+
+R3 crea (*,G) en su tabla de rutas mcast y envía PIM Join al RP (R1).
+
+    $ docker exec r3 vtysh -c "show ip mroute"
+    [se muestran solo las entradas nuevas]
+    *         239.1.1.1   SC     IGMP   eth0   pimreg  1    00:02:11
+                                IGMP          eth2    1
+
+R1 crea esa entrada en el RPT.
+
+    $ docker exec r1 vtysh -c "show ip mroute"
+    [se muestran solo las entradas nuevas]
+    *         239.1.1.1   S      none   eth2   none    0    --:--:--
 
 node2 empieza a enviar a ese grupo:
 
@@ -222,6 +240,19 @@ node2 empieza a enviar a ese grupo:
     [ ID] Interval       Transfer     Bandwidth
     [  1] 0.0000-5.0133 sec   645 KBytes  1.05 Mbits/sec
     [  1] Sent 450 datagrams
+
+1. node2 envía el tráfico a su FHR (R2).
+2. R2 envía el tráfico multicast sobre PIM Register (unicast) al RP (R1).
+
+    $ docker exec r2 vtysh -c "show ip mroute"
+    [se muestran solo las entradas nuevas]
+    10.0.5.3  239.1.1.1   SF     PIM    eth2   eth1    1    00:00:04
+
+3. R1 obtiene el mensaje y lo envía a través del RPT. Crea la entrada (S, G).
+4. R3 realiza SPT switchover y envía PIM Join a R2.
+5. Cuando R2 recibe tráfico por el SPT (R2->R3) envía PIM Prune al RP para cortar el RPT.
+6. R1 envía PIM Register-Stop a R2.
+
 
     # node3 output
     [ ID] Interval       Transfer     Bandwidth        Jitter   Lost/Total Datagrams
