@@ -165,7 +165,7 @@ El campo `Source=BSR` en `rp-info` confirma la convergencia:
      pimreg     up     0.0.0.0   0         local     0    0
 
 
-### Grupos IGMP (LHR)
+### Grupos IGMP en el LHR (R3)
 
     $ docker exec r3 vtysh -c "show ip igmp groups"
     Interface        Group           Mode Timer    Srcs V Uptime
@@ -176,6 +176,7 @@ El campo `Source=BSR` en `rp-info` confirma la convergencia:
     eth2             224.0.1.39      EXCL 00:03:10    1 3 00:03:53
     eth2             224.0.1.40      EXCL 00:03:10    1 3 00:03:53
 
+Estos grupos mcast se utilizan para los mensajes de descubrimiento y anuncio de candidatos RP.
 
 ### Tabla de encaminamiento mcast
 

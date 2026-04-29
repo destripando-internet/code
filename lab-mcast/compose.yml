@@ -13,10 +13,6 @@ services:
     container_name: r1
     hostname: r1
     <<: *common-settings
-    environment:
-      ETH0_IP: 10.0.0.3
-      ETH1_IP: 10.0.1.2
-      ETH2_IP: 10.0.4.2
     volumes:
       - ./router/entrypoint.sh:/entrypoint.sh
       - ./router/daemons:/etc/frr/daemons
@@ -31,10 +27,6 @@ services:
     container_name: r2
     hostname: r2
     <<: *common-settings
-    environment:
-      ETH0_IP: 10.0.1.3
-      ETH1_IP: 10.0.2.2
-      ETH2_IP: 10.0.5.2
     volumes:
       - ./router/entrypoint.sh:/entrypoint.sh
       - ./router/daemons:/etc/frr/daemons
@@ -49,10 +41,6 @@ services:
     container_name: r3
     hostname: r3
     <<: *common-settings
-    environment:
-      ETH0_IP: 10.0.2.3
-      ETH1_IP: 10.0.3.2
-      ETH2_IP: 10.0.4.3
     volumes:
       - ./router/entrypoint.sh:/entrypoint.sh
       - ./router/daemons:/etc/frr/daemons

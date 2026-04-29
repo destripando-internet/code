@@ -1,18 +1,24 @@
 #!/bin/sh
 set -e
 
-find_iface() { ip -o addr show | awk -v ip="$1/" '$0 ~ ip {print $2}' | grep -v lo | head -1; }
 relink() { ip link set "$1" down; ip link set "$1" name "$2"; ip link set "$2" up; }
 
-for i in 0 1 2; do
-    eval ip=\$ETH${i}_IP
-    [ -z "$ip" ] && continue
-    iface=$(find_iface "$ip")
-    [ -z "$iface" ] && continue
+# This script renamea the router interfaces according to the order of their IP addresses, so that they are deterministic. This is necessary because Docker assigns interface names in an unpredictable order.
+
+# Non-loopback interfaces sorted by IP numerically
+ifaces=$(ip -o addr show | awk '$2 != "lo" && /inet / {split($4,a,"/"); print a[1], $2}' \
+    | sort -t. -k1,1n -k2,2n -k3,3n -k4,4n | awk '{print $2}')
+
+i=0
+for iface in $ifaces; do
     relink "$iface" "eth${i}_r"
+    i=$((i + 1))
 done
-for i in 0 1 2; do
-    ip link show "eth${i}_r" >/dev/null 2>&1 && relink "eth${i}_r" "eth${i}"
+
+i=0
+for iface in $ifaces; do
+    relink "eth${i}_r" "eth${i}"
+    i=$((i + 1))
 done
 
 ip route del default 2>/dev/null || true
