@@ -223,13 +223,14 @@ R3 crea (*,G) en su tabla de rutas mcast y envía PIM Join al RP (R1).
     $ docker exec r3 vtysh -c "show ip mroute"
     [se muestran solo las entradas nuevas]
     *         239.1.1.1   SC     IGMP   eth0   pimreg  1    00:02:11
-                                IGMP          eth2    1
+                                 IGMP          eth2    1
 
 R1 crea esa entrada en el RPT.
 
     $ docker exec r1 vtysh -c "show ip mroute"
     [se muestran solo las entradas nuevas]
-    *         239.1.1.1   S      none   eth2   none    0    --:--:--
+    *         239.1.1.1        S      none   eth0   none    0    --:--:--
+    10.0.5.3  239.1.1.1        S      STAR   eth2   eth0    1    00:02:13
 
 node2 empieza a enviar a ese grupo:
 
