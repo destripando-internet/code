@@ -10,10 +10,14 @@ down:
 
 restart: down up
 
-autorp: restart
+autorp: setup-autorp restart
+
+setup-autorp:
 	./setup-autorp.sh
 
-bsr: restart
+bsr: setup-bsr restart
+
+setup-bsr:
 	./setup-bsr.sh
 
 build:

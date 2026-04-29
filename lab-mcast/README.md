@@ -201,16 +201,19 @@ During an active session, each router shows the (S,G) forwarding entry:
      *         239.1.1.1   SC     IGMP   eth1   pimreg  1    00:02:24
      10.0.5.3  239.1.1.1   ST     STAR   eth1   eth0    1    00:02:21
 
-R2 encamina desde eth2 (N5, fuente) hacia N1 (RP via R1) y N2 (R3 directo). Una vez completado el cambio al árbol de camino más corto (SPT), R1 queda recortado y el tráfico fluye directamente R2 → R3.
+R2 encamina desde eth2 (N5, fuente) hacia N1 (RP via R1) y N2 (R3 directo). Una vez completado el cambio al árbol de camino más corto (SPT), R1 queda recortado y el tráfico fluye directamente R2 -> R3.
 
 
 ### Test multicast con iperf
 
-node3 se suscribe al grupo y node2 envía:
+node3 se suscribe al grupo 239.1.1.1:
 
     $ docker exec node3 iperf -s -u -B 239.1.1.1
     Server listening on UDP port 5001
     Joining multicast group  239.1.1.1
+
+
+node2 empieza a enviar a ese grupo:
 
     $ docker exec node2 iperf -c 239.1.1.1 -u -t 5 -T 64
     Client connecting to 239.1.1.1, UDP port 5001
