@@ -1,3 +1,4 @@
+.PHONY: setup-bsr setup-autorp
 
 up: build
 	docker network prune -f
