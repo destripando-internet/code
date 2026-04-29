@@ -299,6 +299,7 @@ En cuanto llega el primer mensaje mcast a `R3`, este efectua el 'SPT switchover'
 Puedes comprobar la tabla de `R1`. El flag `R` indica que está cortado (pruned) y `R1` ya no está enviando tráfico para ese grupo específico. El flag `P` indica que no hay ningún receptor alcanzable por esa interfaz.
 
     $ docker exec r1 vtysh -c "show ip mroute"
+    [solo se muestran los cambios]
     Source    Group            Flags  Proto  Input  Output  TTL  Uptime
     *         239.1.1.1        S      none   eth2   none    0    --:--:--
     10.0.5.3  239.1.1.1        SRP    none   eth1   none    0    --:--:--
@@ -306,6 +307,7 @@ Puedes comprobar la tabla de `R1`. El flag `R` indica que está cortado (pruned)
  En `R3` el flag `T` indica que el tráfico está llegando ahora a través del SPT de `R2`, y que la interfaz de entrada ahora sea `eth0` (que lo conecta con `R2`) lo confirma.
 
     $ docker exec r3 vtysh -c "show ip mroute"
+    [solo se muestran los cambios]
     Source    Group       Flags  Proto  Input  Output  TTL  Uptime
     10.0.5.3  239.1.1.1   ST     STAR   eth0   eth1    1    00:01:37
 
