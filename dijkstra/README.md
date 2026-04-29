@@ -10,6 +10,6 @@ Para ejecutarlos con Visual Studio Code, necesitas elegir o crear un **kernel** 
     - **Create Python Environment**
     - **Venv**
     - Selecciona uno de los intérpretes de Python ya disponibles
-    - Marca `requirementes.txt`
+    - Marca `requirements.txt`
     - Pulsa OK
 1. Cuando termine la instalación, pulsa **Run All** para ejecutar todas las celdas del notebook.

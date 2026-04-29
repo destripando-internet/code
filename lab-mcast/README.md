@@ -14,7 +14,7 @@ Docs:
 
 ## Descripción
 
-El escenario propuesto implica un emisor mcast en `node2` y un receptor en `node3`. Por tanto el FHR (First Hop Router) es R2 y el LHR (Last Hop Router) es R3. El RP (Rendezvous Point), que el nombre que PIM da al router núcleo, será R1 ( 10.0.4.2).
+El escenario propuesto implica un emisor mcast en `node2` y un receptor en `node3`. Por tanto el FHR (First Hop Router) es R2 y el LHR (Last Hop Router) es R3. El RP (Rendezvous Point), que es el nombre que PIM da al router núcleo, será R1 ( 10.0.4.2).
 
 Se ofrecen dos métodos para la elección del RP: Auto-RP y BSR (BootStrap Router), aunque como solo R1 está configurado como candidato, siempre se le elegirá a él. Esto se puede ver respectivamente en `router/autorp-r1.conf` y `router/bsr-r1.conf`.
 
@@ -29,7 +29,7 @@ Setup con BSR:
 
 ### Encaminamiento OSPF
 
-PIM requiere un protocolo de encamiento unicast para descubrir todos los routers y redes de la subred. Para eso tenemos configurado OSPF en todos los routers.
+PIM requiere un protocolo de encaminamiento unicast para descubrir todos los routers y redes de la subred. Para eso tenemos configurado OSPF en todos los routers.
 
 Lo primero es esperar que el protocolo converja:
 
@@ -258,7 +258,7 @@ Arrancamos un emisor mcast en `node2` para ese grupo:
     [  1] local 10.0.5.3 port 40221 connected with 239.1.1.1 port 5001
     [  1] local 239.1.1.1 port 5001 connected with 10.0.5.3 port 40221
 
-`node2` envía el tráfico a su FHR (R2). `R2` ahora conoce la fuente y configura (S,G). Envía el tráfico con PIM Register (unicast) al RP (R1). El flag `F` indica justo es situación (Register Flag).
+`node2` envía el tráfico a su FHR (R2). `R2` ahora conoce la fuente y configura (S,G). Envía el tráfico con PIM Register (unicast) al RP (R1). El flag `F` indica justo esa situación (Register Flag).
 
     $ docker exec r2 vtysh -c "show ip mroute"
     [solo se muestran los cambios]
@@ -272,7 +272,7 @@ Arrancamos un emisor mcast en `node2` para ese grupo:
     Source    Group       Flags  Proto  Input  Output  TTL  Uptime
     10.0.5.3  239.1.1.1   ST     STAR   eth1   eth2    1    00:00:20
 
-La tabla de `R3` confirma que el tráfico está llegando a través del RPT porque no existe la fila (S,G). También puedes comprobar que la interfaz de entrada es `eth1` (que lo conecta con el RP) y la de salida es eth (que lo lleva a `node3`).
+La tabla de `R3` confirma que el tráfico está llegando a través del RPT porque no existe la fila (S,G). También puedes comprobar que la interfaz de entrada es `eth1` (que lo conecta con el RP) y la de salida es eth1 (que lo lleva a `node3`).
 
     $ docker exec r3 vtysh -c "show ip mroute"
     [solo se muestran los cambios]
@@ -309,7 +309,7 @@ Puedes comprobar la tabla de `R1`. El flag `R` indica que está cortado (pruned)
     Source    Group       Flags  Proto  Input  Output  TTL  Uptime
     10.0.5.3  239.1.1.1   ST     STAR   eth0   eth1    1    00:01:37
 
-Como podrás imaginar la opción `spt-swithover` permite valores intermadios entre 0 (que es el valor por defecto) e infinito. Esta opción acepta un tasa umbral arbitraria. La idea es decidir cuando vale la pena crear un SPT específico para un transmisión. Si la tasa es baja (decisión arbitraria) es globalmente más eficiente utilizar el árbol núcleo. Pero cuando la tasa supera el umbral, es mejor enviar el tráfico directamente desde el FHR y así evitar una carga de tráfico significativa a otras partes de la red.
+Como podrás imaginar la opción `spt-switchover` permite valores intermedios entre 0 (que es el valor por defecto) e infinito. Esta opción acepta un tasa umbral arbitraria. La idea es decidir cuando vale la pena crear un SPT específico para un transmisión. Si la tasa es baja (decisión arbitraria) es globalmente más eficiente utilizar el árbol núcleo. Pero cuando la tasa supera el umbral, es mejor enviar el tráfico directamente desde el FHR y así evitar una carga de tráfico significativa a otras partes de la red.
 
 
 ### Capturar tráfico PIM

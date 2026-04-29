@@ -31,7 +31,7 @@ https://github.com/destripando-internet/code/blob/master/upper/
 ### UDP Async
 
 * [async server][udp-async]                            | [doc][asyncio-protocol]
-* [stresss client][udp-stress-client]                  | [doc][asyncio-protocol]
+* [stress client][udp-stress-client]                  | [doc][asyncio-protocol]
 
 
 [udp-client]:  https://github.com/destripando-internet/code/blob/master/upper/udp_client.py
