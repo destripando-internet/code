@@ -1,6 +1,7 @@
 x-common: &common-settings
   privileged: true
   restart: "no"
+  command: /entrypoint.sh
   ulimits:
     nofile:
       soft: 100000
@@ -13,12 +14,13 @@ services:
     hostname: r1
     <<: *common-settings
     volumes:
+      - ./router/entrypoint.sh:/entrypoint.sh
       - ./daemons:/etc/frr/daemons
       - ./frr-r1.conf:/etc/frr/frr.conf
     networks:
       N0: { ipv4_address: 10.0.0.3 }
       N1: { ipv4_address: 10.0.1.2 }
-      N4: { ipv4_address: 10.0.4.2 }
+      N3: { ipv4_address: 10.0.3.2 }
 
   r2:
     image: lab-delta-router
@@ -26,6 +28,7 @@ services:
     hostname: r2
     <<: *common-settings
     volumes:
+      - ./router/entrypoint.sh:/entrypoint.sh
       - ./daemons:/etc/frr/daemons
       - ./frr-r2.conf:/etc/frr/frr.conf
     networks:
@@ -38,19 +41,20 @@ services:
     hostname: r3
     <<: *common-settings
     volumes:
+      - ./router/entrypoint.sh:/entrypoint.sh
       - ./daemons:/etc/frr/daemons
       - ./frr-r3.conf:/etc/frr/frr.conf
     networks:
       N2: { ipv4_address: 10.0.2.3 }
-      N3: { ipv4_address: 10.0.3.2 }
-      N4: { ipv4_address: 10.0.4.3 }
+      N3: { ipv4_address: 10.0.3.3 }
+      N4: { ipv4_address: 10.0.4.2 }
 
   server:
     image: lab-delta-server
     container_name: server
     privileged: true
     networks:
-      N3: { ipv4_address: 10.0.3.3 }
+      N4: { ipv4_address: 10.0.4.3 }
 
 networks:
   N0:

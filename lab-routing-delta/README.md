@@ -12,25 +12,25 @@ Setup:
 Show routing tables:
 
     $ docker exec r1 ip route
-    default via 10.0.4.3 dev eth1
-    10.0.0.0/24 dev eth2 proto kernel scope link src 10.0.0.3
-    10.0.1.0/24 dev eth0 proto kernel scope link src 10.0.1.2
-    10.0.4.0/24 dev eth1 proto kernel scope link src 10.0.4.2
+    default via 10.0.3.3 dev eth2
+    10.0.0.0/24 dev eth0 proto kernel scope link src 10.0.0.3
+    10.0.1.0/24 dev eth1 proto kernel scope link src 10.0.1.2
+    10.0.3.0/24 dev eth2 proto kernel scope link src 10.0.3.2
 
 Ping Server:
 
-    $ ping -c1 10.0.3.3
-    PING 10.0.3.3 (10.0.3.3) 56(84) bytes of data.
-    64 bytes from 10.0.3.3: icmp_seq=1 ttl=62 time=0.164 ms
+    $ ping -c1 10.0.4.3
+    PING 10.0.4.3 (10.0.4.3) 56(84) bytes of data.
+    64 bytes from 10.0.4.3: icmp_seq=1 ttl=62 time=0.164 ms
 
 
 Traceroute Server:
 
-    $ traceroute 10.0.3.3
-    traceroute to 10.0.3.3 (10.0.3.3), 30 hops max, 60 byte packets
+    $ traceroute 10.0.4.3
+    traceroute to 10.0.4.3 (10.0.4.3), 30 hops max, 60 byte packets
     1  10.0.0.3 (10.0.0.3)  0.361 ms  0.309 ms  0.293 ms
-    2  10.0.4.3 (10.0.4.3)  0.280 ms  0.252 ms  0.235 ms
-    3  10.0.3.3 (10.0.3.3)  0.219 ms  0.191 ms  0.171 ms
+    2  10.0.3.3 (10.0.3.3)  0.280 ms  0.252 ms  0.235 ms
+    3  10.0.4.3 (10.0.4.3)  0.219 ms  0.191 ms  0.171 ms
 
 
 ## RIPv2
@@ -44,15 +44,20 @@ Setup:
     $ make rip
 
 
+Wait for the protocol to converge:
+
+    $ ping 10.0.4.3
+
+
 Check config:
 
     $ docker exec r1 ip route
-    default via 10.0.4.3 dev eth2
     10.0.0.0/24 dev eth0 proto kernel scope link src 10.0.0.3
     10.0.1.0/24 dev eth1 proto kernel scope link src 10.0.1.2
-    10.0.2.0/24 nhid 10 via 10.0.1.3 dev eth1 proto rip metric 20
-    10.0.3.0/24 nhid 12 via 10.0.4.3 dev eth2 proto rip metric 20
-    10.0.4.0/24 dev eth2 proto kernel scope link src 10.0.4.2
+    10.0.2.0/24 nhid 8 via 10.0.1.3 dev eth1 proto rip metric 20
+    10.0.3.0/24 dev eth2 proto kernel scope link src 10.0.3.2
+    10.0.4.0/24 nhid 10 via 10.0.3.3 dev eth2 proto rip metric 20
+
 
     $ docker exec r1 vtysh -c "show running-config"
     Building configuration...
@@ -68,7 +73,7 @@ Check config:
     router rip
     network 10.0.0.0/24
     network 10.0.1.0/24
-    network 10.0.4.0/24
+    network 10.0.3.0/24
     exit
     !
     end
@@ -84,12 +89,15 @@ Show routing info:
         > - selected route, * - FIB route, q - queued, r - rejected, b - backup
         t - trapped, o - offload failure
 
-    K>* 0.0.0.0/0 [0/0] via 10.0.4.3, eth2, 00:00:30
-    C>* 10.0.0.0/24 is directly connected, eth0, 00:00:30
-    C>* 10.0.1.0/24 is directly connected, eth1, 00:00:30
-    R>* 10.0.2.0/24 [120/2] via 10.0.1.3, eth1, weight 1, 00:00:24
-    R>* 10.0.3.0/24 [120/2] via 10.0.4.3, eth2, weight 1, 00:00:24
-    C>* 10.0.4.0/24 is directly connected, eth2, 00:00:30
+    IPv4 unicast VRF default:
+    C>* 10.0.0.0/24 is directly connected, eth0, weight 1, 00:00:39
+    L>* 10.0.0.3/32 is directly connected, eth0, weight 1, 00:00:39
+    C>* 10.0.1.0/24 is directly connected, eth1, weight 1, 00:00:39
+    L>* 10.0.1.2/32 is directly connected, eth1, weight 1, 00:00:39
+    R>* 10.0.2.0/24 [120/2] via 10.0.1.3, eth1, weight 1, 00:00:36
+    C>* 10.0.3.0/24 is directly connected, eth2, weight 1, 00:00:39
+    L>* 10.0.3.2/32 is directly connected, eth2, weight 1, 00:00:39
+    R>* 10.0.4.0/24 [120/2] via 10.0.3.3, eth2, weight 1, 00:00:36
 
 
 Show RIP info:
@@ -103,9 +111,10 @@ Show RIP info:
         Network            Next Hop         Metric From            Tag Time
     C(i) 10.0.0.0/24        0.0.0.0               1 self              0
     C(i) 10.0.1.0/24        0.0.0.0               1 self              0
-    R(n) 10.0.2.0/24        10.0.1.3              2 10.0.1.3          0 02:48
-    R(n) 10.0.3.0/24        10.0.4.3              2 10.0.4.3          0 02:57
-    C(i) 10.0.4.0/24        0.0.0.0               1 self              0
+    R(n) 10.0.2.0/24        10.0.1.3              2 10.0.1.3          0 02:42
+    C(i) 10.0.3.0/24        0.0.0.0               1 self              0
+    R(n) 10.0.4.0/24        10.0.3.3              2 10.0.3.3          0 02:40
+
 
 
 Capture RIP traffic:
@@ -142,21 +151,24 @@ Capture RIP traffic:
 
 Simulate link error:
 
-    $ traceroute 10.0.3.3
-    traceroute to 10.0.3.3 (10.0.3.3), 30 hops max, 60 byte packets
-    1  10.0.0.3 (10.0.0.3)  0.049 ms  0.009 ms  0.006 ms
-    2  10.0.4.3 (10.0.4.3)  0.019 ms  0.011 ms  0.010 ms
-    3  10.0.3.3 (10.0.3.3)  0.023 ms  0.013 ms  0.012 ms
+    $ traceroute 10.0.4.3
+    traceroute to 10.0.4.3 (10.0.4.3), 30 hops max, 60 byte packets
+    1  10.0.0.3 (10.0.0.3)  0.514 ms  0.464 ms  0.450 ms
+    2  10.0.3.3 (10.0.3.3)  0.445 ms  0.416 ms  0.395 ms
+    3  10.0.4.3 (10.0.4.3)  0.375 ms  0.314 ms  0.280 ms
 
-    # deactivate the interface connecting R1 to R3 (name can change)
-    $ docker exec r1 ip link set dev eth1 down
+    # deactivate the interface connecting R1 to R3
+    $ docker exec r1 ip link set dev eth2 down
 
-    $ traceroute 10.0.3.3
-    traceroute to 10.0.3.3 (10.0.3.3), 30 hops max, 60 byte packets
-    1  10.0.0.3 (10.0.0.3)  0.052 ms  0.011 ms  0.008 ms
-    2  10.0.1.3 (10.0.1.3)  0.026 ms  0.014 ms  0.014 ms
-    3  10.0.2.3 (10.0.2.3)  0.030 ms  0.018 ms  0.017 ms
-    4  10.0.3.3 (10.0.3.3)  0.033 ms  0.024 ms  0.023 ms
+    # wait RIP discover new path
+
+    $ traceroute 10.0.4.3
+    traceroute to 10.0.4.3 (10.0.4.3), 30 hops max, 60 byte packets
+    1  10.0.0.3 (10.0.0.3)  0.685 ms  0.624 ms  0.601 ms
+    2  10.0.1.3 (10.0.1.3)  0.580 ms  0.541 ms  0.511 ms
+    3  10.0.2.3 (10.0.2.3)  0.482 ms  0.436 ms  0.400 ms
+    4  10.0.4.3 (10.0.4.3)  0.364 ms  0.309 ms  0.265 ms
+
 
 ## OSPFv2
 
@@ -164,9 +176,16 @@ Docs:
 
 - https://docs.frrouting.org/en/stable-10.2/ospfd.html
 
+
 Setup:
 
     $ make ospf
+
+
+Wait for the protocol to converge:
+
+    $ ping 10.0.4.3
+
 
 Show routing info:
 
@@ -178,15 +197,19 @@ Show routing info:
         > - selected route, * - FIB route, q - queued, r - rejected, b - backup
         t - trapped, o - offload failure
 
-    O   10.0.0.0/24 [110/10] is directly connected, eth2, weight 1, 00:01:14
-    C>* 10.0.0.0/24 is directly connected, eth2, 00:01:15
-    O   10.0.1.0/24 [110/10] is directly connected, eth0, weight 1, 00:01:14
-    C>* 10.0.1.0/24 is directly connected, eth0, 00:01:15
-    O>* 10.0.2.0/24 [110/20] via 10.0.1.3, eth0, weight 1, 00:00:24
-    *                      via 10.0.4.3, eth1, weight 1, 00:00:24
-    O>* 10.0.3.0/24 [110/20] via 10.0.4.3, eth1, weight 1, 00:00:24
-    O   10.0.4.0/24 [110/10] is directly connected, eth1, weight 1, 00:00:34
-    C>* 10.0.4.0/24 is directly connected, eth1, 00:01:15
+    IPv4 unicast VRF default:
+    O   10.0.0.0/24 [110/10] is directly connected, eth0, weight 1, 00:01:31
+    C>* 10.0.0.0/24 is directly connected, eth0, weight 1, 00:01:31
+    L>* 10.0.0.3/32 is directly connected, eth0, weight 1, 00:01:31
+    O   10.0.1.0/24 [110/10] is directly connected, eth1, weight 1, 00:01:31
+    C>* 10.0.1.0/24 is directly connected, eth1, weight 1, 00:01:31
+    L>* 10.0.1.2/32 is directly connected, eth1, weight 1, 00:01:31
+    O>* 10.0.2.0/24 [110/20] via 10.0.1.3, eth1, weight 1, 00:00:41
+    *                      via 10.0.3.3, eth2, weight 1, 00:00:41
+    O   10.0.3.0/24 [110/10] is directly connected, eth2, weight 1, 00:00:46
+    C>* 10.0.3.0/24 is directly connected, eth2, weight 1, 00:01:31
+    L>* 10.0.3.2/32 is directly connected, eth2, weight 1, 00:01:31
+    O>* 10.0.4.0/24 [110/20] via 10.0.3.3, eth2, weight 1, 00:00:41
 
 
 Show OSPF info:
@@ -194,52 +217,55 @@ Show OSPF info:
     $ docker exec r1 vtysh -c "show ip ospf route"
     ============ OSPF network routing table ============
     N    10.0.0.0/24           [10] area: 0.0.0.0
-                            directly attached to eth1
+                               directly attached to eth0
     N    10.0.1.0/24           [10] area: 0.0.0.0
-                            directly attached to eth2
+                               directly attached to eth1
     N    10.0.2.0/24           [20] area: 0.0.0.0
-                            via 10.0.1.3, eth2
-                            via 10.0.4.3, eth0
-    N    10.0.3.0/24           [20] area: 0.0.0.0
-                            via 10.0.4.3, eth0
-    N    10.0.4.0/24           [10] area: 0.0.0.0
-                            directly attached to eth0
+                               via 10.0.1.3, eth1
+                               via 10.0.3.3, eth2
+    N    10.0.3.0/24           [10] area: 0.0.0.0
+                               directly attached to eth2
+    N    10.0.4.0/24           [20] area: 0.0.0.0
+                               via 10.0.3.3, eth2
 
     ============ OSPF router routing table =============
-    R    10.0.2.2              [10] area: 0.0.0.0, ASBR
-                            via 10.0.1.3, eth2
-    R    10.0.4.3              [10] area: 0.0.0.0, ASBR
-                            via 10.0.4.3, eth0
+    R    10.0.1.3              [10] area: 0.0.0.0, ASBR
+                               via 10.0.1.3, eth1
+    R    10.0.2.3              [10] area: 0.0.0.0, ASBR
+                               via 10.0.3.3, eth2
 
     ============ OSPF external routing table ===========
+
 
 Show OSPF database:
 
     $ docker exec r1 vtysh -c "show ip ospf database"
 
-        OSPF Router with ID (10.0.4.2)
+       OSPF Router with ID (10.0.0.3)
 
-                    Router Link States (Area 0.0.0.0)
+                Router Link States (Area 0.0.0.0)
 
     Link ID         ADV Router      Age  Seq#       CkSum  Link count
-    10.0.2.2       10.0.2.2         176 0x80000007 0x4c88 2
-    10.0.4.2       10.0.4.2         175 0x80000009 0x4364 3
-    10.0.4.3       10.0.4.3         179 0x80000008 0x712d 3
+    10.0.0.3       10.0.0.3         197 0x8000000a 0xa607 3
+    10.0.1.3       10.0.1.3         197 0x80000007 0x587b 2
+    10.0.2.3       10.0.2.3         192 0x80000008 0x970c 3
 
                     Net Link States (Area 0.0.0.0)
 
     Link ID         ADV Router      Age  Seq#       CkSum
-    10.0.1.2       10.0.4.2         175 0x80000001 0x809e
-    10.0.2.3       10.0.4.3         180 0x80000001 0x7b9f
-    10.0.4.3       10.0.4.3         180 0x80000001 0x779f
+    10.0.1.3       10.0.1.3         198 0x80000001 0x6cb6
+    10.0.2.3       10.0.2.3         198 0x80000001 0x70ae
+    10.0.3.3       10.0.2.3         193 0x80000001 0x5cc2
+
 
 Neighbors:
 
     $ docker exec r1 vtysh -c "show ip ospf neighbor"
 
-    Neighbor ID   Pri State           Up Time   Dead Time Address    Interface       RXmtL RqstL DBsmL
-    10.0.4.3        1 2-Way/DROther   12.526s     37.473s 10.0.4.3   eth0:10.0.4.2       0     0     0
-    10.0.2.2        1 2-Way/DROther   12.654s     37.345s 10.0.1.3   eth2:10.0.1.2       0     0     0
+    Neighbor ID   Pri  State     Up Time   Dead Time Address   Interface       RXmtL RqstL DBsmL
+    10.0.1.3      1    Full/DR    3m46s    33.340s 10.0.1.3    eth1:10.0.1.2       0     0     0
+    10.0.2.3      1    Full/DR    3m46s    33.427s 10.0.3.3    eth2:10.0.3.2       0     0     0
+
 
 Capture OSPF traffic:
 
@@ -248,10 +274,10 @@ Capture OSPF traffic:
         OSPF Header
             Version: 2
             Message Type: Hello Packet (1)
-            Packet Length: 44
-            Source OSPF Router: 10.0.4.2
+            Packet Length: 48
+            Source OSPF Router: 10.0.3.2
             Area ID: 0.0.0.0 (Backbone)
-            Checksum: 0xee9c [correct]
+            Checksum: 0xd18f [correct]
             Auth Type: Null (0)
             Auth Data (none): 0000000000000000
         OSPF Hello Packet
@@ -268,15 +294,17 @@ Capture OSPF traffic:
                 .... ...0 = (MT) Multi-Topology Routing: No
             Router Priority: 1
             Router Dead Interval [sec]: 40
-            Designated Router: 0.0.0.0
-            Backup Designated Router: 0.0.0.0
+            Designated Router: 10.0.1.3
+            Backup Designated Router: 10.0.1.2
+            Active Neighbor: 10.0.0.3
+
 
     Open Shortest Path First
         OSPF Header
             Version: 2
             Message Type: DB Description (2)
             Packet Length: 32
-            Source OSPF Router: 10.0.4.2
+            Source OSPF Router: 10.0.3.2
             Area ID: 0.0.0.0 (Backbone)
             Checksum: 0x962d [correct]
             Auth Type: Null (0)
@@ -304,22 +332,22 @@ Capture OSPF traffic:
             Version: 2
             Message Type: LS Request (3)
             Packet Length: 36
-            Source OSPF Router: 10.0.4.3
+            Source OSPF Router: 10.0.3.3
             Area ID: 0.0.0.0 (Backbone)
             Checksum: 0xd3d0 [correct]
             Auth Type: Null (0)
             Auth Data (none): 0000000000000000
         Link State Request
             LS Type: Router-LSA (1)
-            Link State ID: 10.0.4.2
-            Advertising Router: 10.0.4.2
+            Link State ID: 10.0.3.2
+            Advertising Router: 10.0.3.2
 
     Open Shortest Path First
         OSPF Header
             Version: 2
             Message Type: LS Update (4)
             Packet Length: 88
-            Source OSPF Router: 10.0.4.2
+            Source OSPF Router: 10.0.3.2
             Area ID: 0.0.0.0 (Backbone)
             Checksum: 0x810e [correct]
             Auth Type: Null (0)
@@ -339,8 +367,8 @@ Capture OSPF traffic:
                     .... ..1. = (E) External Routing: Capable
                     .... ...0 = (MT) Multi-Topology Routing: No
                 LS Type: Router-LSA (1)
-                Link State ID: 10.0.4.2
-                Advertising Router: 10.0.4.2
+                Link State ID: 10.0.3.2
+                Advertising Router: 10.0.3.2
                 Sequence Number: 0x80000006
                 Checksum: 0xa525
                 Length: 60
@@ -359,7 +387,7 @@ Capture OSPF traffic:
                     Number of Metrics: 0 - TOS
                     0 Metric: 10
                 Type: Stub     ID: 10.0.4.0        Data: 255.255.255.0   Metric: 10
-                    Link ID: 10.0.4.0 - IP network/subnet number
+                    Link ID: 10.0.3.0 - IP network/subnet number
                     Link Data: 255.255.255.0
                     Link Type: 3 - Connection to a stub network
                     Number of Metrics: 0 - TOS
@@ -376,7 +404,7 @@ Capture OSPF traffic:
             Version: 2
             Message Type: LS Acknowledge (5)
             Packet Length: 44
-            Source OSPF Router: 10.0.4.3
+            Source OSPF Router: 10.0.3.3
             Area ID: 0.0.0.0 (Backbone)
             Checksum: 0xac5d [correct]
             Auth Type: Null (0)
@@ -394,8 +422,8 @@ Capture OSPF traffic:
                 .... ..1. = (E) External Routing: Capable
                 .... ...0 = (MT) Multi-Topology Routing: No
             LS Type: Router-LSA (1)
-            Link State ID: 10.0.4.2
-            Advertising Router: 10.0.4.2
+            Link State ID: 10.0.3.2
+            Advertising Router: 10.0.3.2
             Sequence Number: 0x80000006
             Checksum: 0xa525
             Length: 60
@@ -410,12 +438,13 @@ Check routes:
 
     $ docker exec r1 ip route
     10.0.0.0/24 dev eth0 proto kernel scope link src 10.0.0.3
-    10.0.1.0/24 dev eth2 proto kernel scope link src 10.0.1.2
-    10.0.2.0/24 nhid 24 proto eigrp metric 20
-        nexthop via 10.0.1.3 dev eth2 weight 1
-        nexthop via 10.0.4.3 dev eth1 weight 1
-    10.0.3.0/24 nhid 25 via 10.0.4.3 dev eth1 proto eigrp metric 20
-    10.0.4.0/24 dev eth1 proto kernel scope link src 10.0.4.2
+    10.0.1.0/24 dev eth1 proto kernel scope link src 10.0.1.2
+    10.0.2.0/24 nhid 18 proto eigrp metric 20
+        nexthop via 10.0.1.3 dev eth1 weight 1
+        nexthop via 10.0.3.3 dev eth2 weight 1
+    10.0.3.0/24 dev eth2 proto kernel scope link src 10.0.3.2
+    10.0.4.0/24 nhid 19 via 10.0.3.3 dev eth2 proto eigrp metric 20
+
 
 Show routing info:
 
@@ -427,20 +456,25 @@ Show routing info:
         > - selected route, * - FIB route, q - queued, r - rejected, b - backup
         t - trapped, o - offload failure
 
-    E   10.0.0.0/24 [90/28160] is directly connected, eth0, weight 1, 00:01:32
-    C>* 10.0.0.0/24 is directly connected, eth0, 00:01:35
-    E   10.0.1.0/24 [90/28160] is directly connected, eth2, weight 1, 00:01:32
-    C>* 10.0.1.0/24 is directly connected, eth2, 00:01:35
-    E>* 10.0.2.0/24 [90/30720] via 10.0.1.3, eth2, weight 1, 00:01:32
-    *                          via 10.0.4.3, eth1, weight 1, 00:01:32
-    E>* 10.0.3.0/24 [90/30720] via 10.0.4.3, eth1, weight 1, 00:01:32
-    E   10.0.4.0/24 [90/28160] is directly connected, eth1, weight 1, 00:01:33
-    C>* 10.0.4.0/24 is directly connected, eth1, 00:01:35
+    IPv4 unicast VRF default:
+    E   10.0.0.0/24 [90/28160] is directly connected, eth0, weight 1, 00:01:04
+    C>* 10.0.0.0/24 is directly connected, eth0, weight 1, 00:01:11
+    L>* 10.0.0.3/32 is directly connected, eth0, weight 1, 00:01:11
+    E   10.0.1.0/24 [90/28160] is directly connected, eth1, weight 1, 00:01:04
+    C>* 10.0.1.0/24 is directly connected, eth1, weight 1, 00:01:11
+    L>* 10.0.1.2/32 is directly connected, eth1, weight 1, 00:01:11
+    E>* 10.0.2.0/24 [90/30720] via 10.0.1.3, eth1, weight 1, 00:01:04
+    *                        via 10.0.3.3, eth2, weight 1, 00:01:04
+    E   10.0.3.0/24 [90/28160] is directly connected, eth2, weight 1, 00:01:04
+    C>* 10.0.3.0/24 is directly connected, eth2, weight 1, 00:01:11
+    L>* 10.0.3.2/32 is directly connected, eth2, weight 1, 00:01:11
+    E>* 10.0.4.0/24 [90/30720] via 10.0.3.3, eth2, weight 1, 00:01:04
+
 
 Show EIGRP info:
 
     $ docker exec r1 vtysh -c "show ip eigrp topology"
-    EIGRP Topology Table for AS(100)/ID(10.0.4.2)
+    EIGRP Topology Table for AS(100)/ID(10.0.3.2)
 
     Codes: P - Passive, A - Active, U - Update, Q - Query, R - Reply
         r - reply Status, s - sia Status
@@ -448,22 +482,23 @@ Show EIGRP info:
     P  10.0.0.0/24, 1 successors, FD is 28160, serno: 0
         via Connected, eth0
     P  10.0.1.0/24, 1 successors, FD is 28160, serno: 0
-        via Connected, eth2
-    P  10.0.2.0/24, 2 successors, FD is 30720, serno: 0
-        via 10.0.1.3 (30720/28160), eth2
-        via 10.0.4.3 (30720/28160), eth1
-    P  10.0.3.0/24, 1 successors, FD is 30720, serno: 0
-        via 10.0.4.3 (30720/28160), eth1
-    P  10.0.4.0/24, 1 successors, FD is 28160, serno: 0
         via Connected, eth1
+    P  10.0.2.0/24, 2 successors, FD is 30720, serno: 0
+        via 10.0.1.3 (30720/28160), eth1
+        via 10.0.3.3 (30720/28160), eth2
+    P  10.0.3.0/24, 1 successors, FD is 28160, serno: 0
+        via Connected, eth2
+    P  10.0.4.0/24, 1 successors, FD is 30720, serno: 0
+        via 10.0.3.3 (30720/28160), eth2
+
 
 Neighbors:
 
     $ docker exec r1 vtysh -c "show ip eigrp neighbor"
 
-    EIGRP neighbors for AS(100)
+    EIGRP neighbors for AS(100)EIGRP neighbors for AS(100)
 
     H   Address           Interface            Hold   Uptime   SRTT   RTO   Q     Seq
                                             (sec)           (ms)        Cnt    Num
-    0   10.0.4.3          eth1                 11     0        0      2    0      3
-    0   10.0.1.3          eth2                 11     0        0      2    0      3
+    0   10.0.1.3          eth1                 10     0        0      2    0      3
+    0   10.0.3.3          eth2                 10     0        0      2    0      3

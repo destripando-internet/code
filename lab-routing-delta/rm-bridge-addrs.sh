@@ -17,7 +17,7 @@ flush_ips() {
 
 echo -n "-- Removing host bridge addresses: "
 
-for bridge in N1 N2 N3; do
+for bridge in N1 N2 N3 N4; do
     flush_ips $bridge
 done
 
