@@ -170,8 +170,8 @@ def run_mapping_behavior_test(local_port, discovery):
     logging.info(f"Test III ({alt_ip}:{alt_port}) -> {ma3[0]}:{ma3[1]}")
 
     if ma2 == ma3:
-        return "ADM (Address-Dependent Mapping)"
-    return "APDM (Address and Port-Dependent Mapping, i.e. 'Symmetric')"
+        return "ADM (Address-Dependent Mapping) / Symmetric NAT"
+    return "APDM (Address and Port-Dependent Mapping) / Symmetric NAT"
 
 
 def run_nat_type_test(local_port):
