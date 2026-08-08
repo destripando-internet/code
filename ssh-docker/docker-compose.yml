@@ -2,8 +2,8 @@ version: '3.3'
 
 services:
   ssh:
-    container_name: viper
-    hostname: viper
+    container_name: sidney
+    hostname: sidney
     build: .
     networks:
       localnet:

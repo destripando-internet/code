@@ -1,3 +1,3 @@
 #!/bin/bash
 
-docker inspect --format='{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' viper
+docker inspect --format='{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' sidney
